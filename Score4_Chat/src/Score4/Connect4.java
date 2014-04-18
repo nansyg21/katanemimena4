@@ -29,6 +29,7 @@ public class Connect4 extends Applet implements Runnable {
 
   public void init() {
     // Load and track the images
+	  setSize(200,250);
     tracker = new MediaTracker(this);
     boardImg = getImage(getCodeBase(), "Res/Board.gif");
     tracker.addImage(boardImg, 0);

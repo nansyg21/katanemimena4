@@ -3,7 +3,9 @@ import java.io.*;
 import java.applet.*;
 import java.awt.*;
 public class ChatClient extends Applet
-{  private Socket socket              = null;
+{
+	public ChatClient() {
+	}  private Socket socket              = null;
    private DataInputStream  console   = null;
    private DataOutputStream streamOut = null;
    private ChatClientThread client    = null;
@@ -69,5 +71,6 @@ public class ChatClient extends Applet
    {  display.appendText(msg + "\n"); }
    public void getParameters()
    {  serverName = getParameter("host");
-      serverPort = Integer.parseInt(getParameter("port")); }
+      //serverPort = Integer.parseInt(getParameter("port")); 
+      serverPort = 4444; }
 }

@@ -81,10 +81,10 @@ public class ChatServer implements Runnable
    }
    public static void main(String args[])
    {  ChatServer server = null;
-      if (args.length != 1)
-         System.out.println("Usage: java ChatServer port");
-      else
-         server = new ChatServer(Integer.parseInt(args[0]));
+      //if (args.length != 1)
+       //  System.out.println("Usage: java ChatServer port");
+    //  else
+         server = new ChatServer(4444);
    }
 
 }
