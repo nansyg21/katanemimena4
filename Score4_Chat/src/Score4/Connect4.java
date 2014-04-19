@@ -1,6 +1,8 @@
 package Score4;
 
 
+
+
 import java.applet.*;
 import java.awt.*;
 import java.io.IOException;

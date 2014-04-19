@@ -1,5 +1,6 @@
 package Score4;
 
+
 // Connect4State Class
 // Connect4State.java
 
@@ -8,7 +9,7 @@ package Score4;
 // and generosity!
 
 // Imports
-class Connect4State {
+public class Connect4State {
   public static final int winPlaces = 69, maxPieces = 42,
     Empty = 2;
   public static boolean[][][] map;

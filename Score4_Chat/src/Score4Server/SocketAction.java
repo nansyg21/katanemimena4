@@ -10,7 +10,7 @@ package Score4Server;
 import java.net.*;
 import java.io.*;
 
-class SocketAction extends Thread {
+public class SocketAction extends Thread {
   private DataInputStream inStream = null;
   protected PrintStream   outStream = null;
   private Socket          socket = null;

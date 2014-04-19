@@ -1,5 +1,6 @@
 package Score4Server;
 
+
 // Connect4Daemon Class
 // Connect4Daemon.java
 
@@ -10,7 +11,7 @@ package Score4Server;
 import java.net.*;
 import java.io.*;
 
-class Connect4Daemon extends Thread {
+public class Connect4Daemon extends Thread {
   public static final int PORTNUM = 1234;
   private ServerSocket    port;
   private Connect4Player  playerWaiting = null;

@@ -1,5 +1,6 @@
 package Score4;
 
+
 // Connect4Engine Class
 // Connect4Engine.java
 
@@ -11,7 +12,7 @@ package Score4;
 import java.awt.*;
 import java.util.Random;
 
-class Connect4Engine {
+public class Connect4Engine {
   private static Random rand = new
     Random(System.currentTimeMillis());
   private Connect4State state;

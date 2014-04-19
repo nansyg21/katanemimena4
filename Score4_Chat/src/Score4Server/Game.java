@@ -1,5 +1,6 @@
 package Score4Server;
 
+
 // Game Class
 // Game.java
 
@@ -10,7 +11,7 @@ package Score4Server;
 import java.io.*;
 import java.util.*;
 
-class Game {
+public class Game {
   public static final int ERROR = -1;
   public static final int IWON = -2;
   public static final int IQUIT = -3;

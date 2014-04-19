@@ -1,5 +1,6 @@
 package Score4Server;
 
+
 // Connect4Player Class
 // Connect4Player.java
 
@@ -10,7 +11,10 @@ package Score4Server;
 import java.net.*;
 import java.io.*;
 
-class Connect4Player extends SocketAction {
+
+
+
+public class Connect4Player extends SocketAction {
   private Connect4Daemon daemon = null;
 
   public Connect4Player(Connect4Daemon server, Socket sock) {

@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import Score4Server.Connect4Daemon;
 
 public class ChatServer implements Runnable
 {  private ChatServerThread clients[] = new ChatServerThread[50];
@@ -81,10 +82,16 @@ public class ChatServer implements Runnable
    }
    public static void main(String args[])
    {  ChatServer server = null;
+      Thread thread = null;
+     
+      
       //if (args.length != 1)
        //  System.out.println("Usage: java ChatServer port");
     //  else
-         server = new ChatServer(4444);
+      server = new ChatServer(4444);
+
+
+      new Connect4Daemon().start();
    }
 
 }

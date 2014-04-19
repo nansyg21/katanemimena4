@@ -1,5 +1,6 @@
 package Score4;
 
+
 // Connect4ClientConnection Class
 // Connect4ClientConnection.java
 
@@ -7,22 +8,23 @@ package Score4;
 // to reuse this code however you choose. Thanks Greg!
 
 // Imports
+
 import java.io.*;
 import java.net.*;
 import java.applet.*;
 
-class Connect4ClientConnection extends SocketAction {
-  static final int PORTNUM = 1234;
-  static final int ERROR = -1;
-  static final int PLSWAIT = -2;
-  static final int YOURTURN = -3;
-  static final int THEIRTURN = -4;
-  static final int THEYWON = -5;
-  static final int THEYQUIT = -6;
-  static final int THEYTIED = -7;
-  static final int GAMEOVER = -8;
+public class Connect4ClientConnection extends SocketAction {
+	public static final int PORTNUM = 1234;
+	public static final int ERROR = -1;
+	public static final int PLSWAIT = -2;
+	public static final int YOURTURN = -3;
+	public static final int THEIRTURN = -4;
+	public static final int THEYWON = -5;
+	public  static final int THEYQUIT = -6;
+	public  static final int THEYTIED = -7;
+  public static final int GAMEOVER = -8;
 
-  Connect4ClientConnection(Applet a) throws IOException {
+  public Connect4ClientConnection(Applet a) throws IOException {
     super(new Socket(a.getCodeBase().getHost(), PORTNUM));
   }
 
