@@ -13,11 +13,13 @@ public class ChatClient extends Applet implements Runnable
 {
 	public ChatClient() {
 
-	}  private Socket socket              = null;
+	}  
+	
+	private Socket socket              = null;
 	private DataInputStream  console   = null;
 	private DataOutputStream streamOut = null;
 	private ChatClientThread client    = null;
-	private TextArea  display = new TextArea();
+	private TextArea  display = new TextArea("",15,20);
 	private TextField input   = new TextField();
 	private Button    send    = new Button("Send"), connect = new Button("Connect"),
 			quit    = new Button("Bye");
@@ -46,6 +48,8 @@ public class ChatClient extends Applet implements Runnable
 	private Panel cardPanel;
 	private Panel loginPanel, gamePanel;
 	private CardLayout cl;
+	private TextField username=null;
+	private Boolean authenticated=false;
 
 	final static String LOGINPANEL="LOGINPANEL";
 	final static String GAMEPANEL="GAMEPANEL";
@@ -56,19 +60,35 @@ public class ChatClient extends Applet implements Runnable
 		cardPanel=new Panel();
 		cl=new CardLayout();
 		cardPanel.setLayout(cl);
-		this.add(cardPanel);
+		
+		this.setLayout(new BorderLayout());
+		this.add(cardPanel, BorderLayout.EAST);
+		
 		
 		//create login frame
 		loginPanel=new Panel();
-		TextField username=new TextField("",20);
+		username=new TextField("",20);
 		Button loginBt=new Button("Login");
 		loginPanel.add(username);
-		loginBt.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {cl.show(cardPanel, "game");}});
+		loginBt.addActionListener(new ActionListener()
+		{public void actionPerformed(ActionEvent arg0)
+		{
+			try
+			{
+				System.out.println(username.getText());
+			streamOut.writeUTF("#login_verification#"+username.getText());
+			}
+			
+			catch(IOException ioe)
+			{  
+				println("Sending error: " + ioe.getMessage()); close(); 
+			}
+			cl.show(cardPanel, "game");}});
 		loginPanel.add(loginBt);
 		
 		//
 		// Load and track the images
-		setSize(399,285);
+		setSize(500,285);
 		tracker = new MediaTracker(this);
 		boardImg = getImage(getCodeBase(), "Res/Board.gif");
 		tracker.addImage(boardImg, 0);
@@ -97,16 +117,17 @@ public class ChatClient extends Applet implements Runnable
 		south.setBounds(0, 250, 400, 34);
 		south.setLayout(new BorderLayout());
 		south.add("West", keys); 
-		south.add("Center", input);  
+		south.add("North", input);  
 		south.add("East", send);
 		//setLayout(null);
 		
 		
-		gamePanel=new Panel();
+		gamePanel=new Panel(new BorderLayout());
 		display.setBounds(200, 0, 200, 252);
-		gamePanel.add(display);
-		gamePanel.add(south);
+		gamePanel.add(display, BorderLayout.NORTH);
+		gamePanel.add(south, BorderLayout.SOUTH);
 		
+	
 		
 		cardPanel.add(loginPanel, LOGINPANEL);
 		cardPanel.add(gamePanel, "game");	
@@ -142,6 +163,16 @@ public class ChatClient extends Applet implements Runnable
 		}
 		return true; 
 	}
+
+	public Boolean getAuthenticated() {
+		return authenticated;
+	}
+
+
+	public void setAuthenticated(Boolean authenticated) {
+		this.authenticated = authenticated;
+	}
+
 
 	public void connect(String serverName, int serverPort)
 	{ 
@@ -525,3 +556,4 @@ public class ChatClient extends Applet implements Runnable
 		repaint();
 	}
 }
+
