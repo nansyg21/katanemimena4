@@ -203,7 +203,7 @@ public class ChatClient extends Applet implements Runnable
 	   try
 	   {
 		   Communication comm_temp = new Communication(txtField.getText(), property);
-
+		   txtField.setText("");
 		   // streamOut.writeUTF(txtField.getText()); streamOut.flush(); txtField.setText("");
 		   streamOutObject.writeObject(comm_temp);
 	   }  	 

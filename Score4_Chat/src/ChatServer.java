@@ -59,13 +59,13 @@ public class ChatServer implements Runnable
          thread = null;
       }
    }
-   private int findClient(int ID)
+   private int findClient(String ID)
    {  for (int i = 0; i < clientCount; i++)
-         if (clients[i].getID() == ID)
+         if (clients[i].getID().equals(ID))
             return i;
       return -1;
    }
-   public synchronized void handle(int ID, String input, String property)
+   public synchronized void handle(String ID, String input, String property)
    {  
 	   if(property.equals("#login_verification#"))
 		{
@@ -79,6 +79,7 @@ public class ChatServer implements Runnable
 			{
 				if(rs!=null)
 				{
+					clients[findClient(ID)].setName(input);
 					clients[findClient(ID)].send(new Communication("You have been authenticated","#authentication#"));
 				}
 				else {
@@ -106,8 +107,22 @@ public class ChatServer implements Runnable
 	   else if(property.equals("Private"))//Message is for Team
 	   {
 		   //FIND THE PARTNER ID BASED ON YOUR ID
-		  // clients[findClient(ID-1)].send(input);
-		   clients[0].send(new Communication(ID + ": " + input, property) );
+		   if(findClient(ID) %2 ==0)
+		   {//first player to join the team
+			   clients[findClient(ID)].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+			   try{
+				   clients[findClient(ID)+1].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+			   }
+			   catch(NullPointerException e){
+				   clients[findClient(ID)+1].send(new Communication("No teammate joined", property) );
+			   }
+		   }
+		   else
+		   {
+			   clients[findClient(ID)].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+			   clients[findClient(ID)-1].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+		   }
+		   
 		   clients[1].send(new Communication(ID + ": " + input, property) );
 		  
 	   }
@@ -119,7 +134,7 @@ public class ChatServer implements Runnable
          for (int i = 0; i < clientCount; i++)
             clients[i].send(new Communication(ID + ": " + input, property) );
    }
-   public synchronized void remove(int ID)
+   public synchronized void remove(String ID)
    {  int pos = findClient(ID);
       if (pos >= 0)
       {  ChatServerThread toTerminate = clients[pos];

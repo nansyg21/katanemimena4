@@ -4,7 +4,8 @@ import java.io.*;
 public class ChatServerThread extends Thread
 {  private ChatServer       server    = null;
    private Socket           socket    = null;
-   private int              ID        = -1;
+   private String           ID        =""+ -1;
+   private String           Name      = " ";
    private DataInputStream  streamIn  =  null;
    private ObjectInputStream streamInObject = null;
    private DataOutputStream streamOut = null;
@@ -15,7 +16,14 @@ public class ChatServerThread extends Thread
    {  super();
       server   = _server;
       socket   = _socket;
-      ID       = socket.getPort();
+      ID       = ""+socket.getPort();
+ 
+   }
+   public ChatServerThread(ChatServer _server, Socket _socket, String _ID )
+   {  super();
+      server   = _server;
+      socket   = _socket;
+      ID       = _ID;
  
    }
    public void send(Communication comm)
@@ -31,13 +39,23 @@ public class ChatServerThread extends Thread
           stop();
        }
    }
-   public int getID()
+   public String getID()
    {  return ID;
+   }
+   public void setID(String id)
+   {  ID=id;
    }
    public String getProperty()
    {  return property;
    }
-   public void run()
+  
+   public String getname() {
+	return Name;
+}
+public void setname(String name) {
+	Name = name;
+}
+public void run()
    {  System.out.println("Server Thread " + ID + " running.");
       while (true)
       {  try
