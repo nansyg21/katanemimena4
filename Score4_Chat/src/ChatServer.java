@@ -44,13 +44,24 @@ public class ChatServer implements Runnable
             return i;
       return -1;
    }
-   public synchronized void handle(int ID, String input)
-   {  if (input.equals(".bye"))
-      {  clients[findClient(ID)].send(".bye");
-         remove(ID); }
-      else
+   public synchronized void handle(int ID, String input, String property)
+   {  
+	   if (input.equals(".bye"))
+	   {
+		   clients[findClient(ID)].send(new Communication("Public",".bye") );
+		   remove(ID);
+	   }
+	   else if(property.equals("Private"))//Message is for Team
+	   {
+		   //FIND THE PARTNER ID BASED ON YOUR ID
+		  // clients[findClient(ID-1)].send(input);
+		   clients[0].send(new Communication(ID + ": " + input, property) );
+		   clients[1].send(new Communication(ID + ": " + input, property) );
+		  
+	   }
+      else              ////Message is for Public
          for (int i = 0; i < clientCount; i++)
-            clients[i].send(ID + ": " + input);   
+            clients[i].send(new Communication(ID + ": " + input, property) );
    }
    public synchronized void remove(int ID)
    {  int pos = findClient(ID);
