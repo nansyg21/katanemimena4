@@ -2,6 +2,8 @@ import java.net.*;
 import java.io.*;
 import java.applet.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import Score4.Connect4;
 import Score4.Connect4ClientConnection;
@@ -44,50 +46,116 @@ public class ChatClient extends Applet implements Runnable
    private Connect4ClientConnection  connection = null;
 
    //
+   private Panel cardPanel;
+   private Panel loginPanel, gamePanel;
+   private CardLayout cl;
+   private TextField username=null;
+   private Boolean authenticated=false;
+
+   final static String LOGINPANEL="LOGINPANEL";
+   final static String GAMEPANEL="GAMEPANEL";
 
    public void init()
    { 
-	   //
-	   // Load and track the images
-		  setSize(600,285);
-	    tracker = new MediaTracker(this);
-	    boardImg = getImage(getCodeBase(), "Res/Board.gif");
-	    tracker.addImage(boardImg, 0);
-	    handImg = getImage(getCodeBase(), "Res/Hand.gif");
-	    tracker.addImage(handImg, 0);
-	    pieceImg[0] = getImage(getCodeBase(), "Res/RedPiece.gif");
-	    tracker.addImage(pieceImg[0], 0);
-	    pieceImg[1] = getImage(getCodeBase(), "Res/BluPiece.gif");
-	    tracker.addImage(pieceImg[1], 0);
 
-	    // Load the audio clips
-	    newGameSnd = getAudioClip(getCodeBase(), "Res/NewGame.au");
-	    sadSnd = getAudioClip(getCodeBase(), "Res/Sad.au");
-	    applauseSnd = getAudioClip(getCodeBase(), "Res/Applause.au");
-	    badMoveSnd = getAudioClip(getCodeBase(), "Res/BadMove.au");
-	    redSnd = getAudioClip(getCodeBase(), "Res/RedMove.au");
-	    blueSnd = getAudioClip(getCodeBase(), "Res/BlueMove.au");
-	   //
-    
-	  
-	   Panel keys = new Panel(); keys.setLayout(new GridLayout(1,2));
-      keys.add(quit); keys.add(connect);
-      Panel south = new Panel(); 
-      south.setBounds(0, 250, 400, 34);south.setLayout(new BorderLayout());
-      south.add("West", keys); south.add("Center", inputPublic);  south.add("East", sendPublic);
-      setLayout(null);displayPublic.setBounds(200, 0, 200, 252);
- add(displayPublic);  add(south);
-  
-  
-  displayPrivate.setBounds(400, 0, 200, 252);
-  add(displayPrivate);
-  inputPrivate.setBounds(400, 250, 163, 34);
-  
-  add(inputPrivate);
-  sendPrivate.setBounds(561, 250, 39, 34);
-  
-  add(sendPrivate);
-      quit.disable(); sendPublic.disable(); sendPrivate.disable(); getParameters(); }
+	   cardPanel=new Panel();
+		cl=new CardLayout();
+		cardPanel.setLayout(cl);
+		
+		this.setLayout(new BorderLayout());
+		this.add(cardPanel, BorderLayout.EAST);
+		
+		
+		//create login frame
+		loginPanel=new Panel();
+		username=new TextField("",20);
+		Button loginBt=new Button("Login");
+		loginPanel.add(username);
+		loginBt.addActionListener(new ActionListener()
+		{public void actionPerformed(ActionEvent arg0)
+		{
+			try
+			{
+				if(!authenticated)
+				{
+				System.out.println(username.getText());
+				connect(serverName, serverPort);
+				streamOutObject.writeObject(new Communication(username.getText(),"#login_verification#"));
+				}
+				else
+				{
+					cl.show(cardPanel, "game");
+				}
+			}
+			
+			catch(IOException ioe)
+			{  
+				printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+			}			
+			}
+		}
+		);
+		loginPanel.add(loginBt);
+		
+		//
+		// Load and track the images
+		setSize(500,285);
+		tracker = new MediaTracker(this);
+		boardImg = getImage(getCodeBase(), "Res/Board.gif");
+		tracker.addImage(boardImg, 0);
+		handImg = getImage(getCodeBase(), "Res/Hand.gif");
+		tracker.addImage(handImg, 0);
+		pieceImg[0] = getImage(getCodeBase(), "Res/RedPiece.gif");
+		tracker.addImage(pieceImg[0], 0);
+		pieceImg[1] = getImage(getCodeBase(), "Res/BluPiece.gif");
+		tracker.addImage(pieceImg[1], 0);
+
+		// Load the audio clips
+		newGameSnd = getAudioClip(getCodeBase(), "Res/NewGame.au");
+		sadSnd = getAudioClip(getCodeBase(), "Res/Sad.au");
+		applauseSnd = getAudioClip(getCodeBase(), "Res/Applause.au");
+		badMoveSnd = getAudioClip(getCodeBase(), "Res/BadMove.au");
+		redSnd = getAudioClip(getCodeBase(), "Res/RedMove.au");
+		blueSnd = getAudioClip(getCodeBase(), "Res/BlueMove.au");
+		//
+
+
+		Panel keys = new Panel();
+		keys.setLayout(new GridLayout(1,2));
+		keys.add(quit); 
+		keys.add(connect);
+		Panel south = new Panel(); 
+		south.setBounds(0, 250, 400, 34);
+		south.setLayout(new BorderLayout());
+		south.add("West", keys); 
+		south.add("North", inputPrivate);  
+		south.add("East", sendPrivate);
+		south.add("East", inputPublic);
+		south.add("East", sendPrivate);
+		//setLayout(null);
+		
+		
+		gamePanel=new Panel(new BorderLayout());
+		//display.setBounds(200, 0, 200, 252);
+		gamePanel.add(displayPublic, BorderLayout.NORTH);
+		gamePanel.add(displayPrivate, BorderLayout.EAST);
+		gamePanel.add(south, BorderLayout.SOUTH);
+		
+	
+		
+		cardPanel.add(loginPanel, LOGINPANEL);
+		cardPanel.add(gamePanel, "game");	
+		cl.show(cardPanel, LOGINPANEL);
+		
+		
+		//add(display);  
+	//	add(south);
+		quit.disable(); 
+		sendPublic.disable();
+		sendPrivate.disable();
+		getParameters();
+	}
+
    public boolean action(Event e, Object o)
    {  if (e.target == quit)
       {  inputPublic.setText(".bye");
@@ -132,7 +200,15 @@ public class ChatClient extends Applet implements Runnable
 		   printlnPublic(msg);
 	   }
 	   
-	   else {printlnPrivate(msg); }; 
+	   else if(property.equals("Private"))
+	   {
+		   printlnPrivate(msg); 
+	   }
+	   else if(property.equals("#authentication#"))
+	   {
+		   authenticated=true;
+	   }
+		   
    }
    public void open()
    {  try

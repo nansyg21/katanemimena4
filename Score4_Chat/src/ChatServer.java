@@ -1,4 +1,8 @@
 import java.net.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.io.*;
 import Score4Server.Connect4Daemon;
 
@@ -7,6 +11,7 @@ public class ChatServer implements Runnable
    private ServerSocket server = null;
    private Thread       thread = null;
    private int clientCount = 0;
+   private Connection con = null;
 
    public ChatServer(int port)
    {  try
@@ -16,6 +21,22 @@ public class ChatServer implements Runnable
          start(); }
       catch(IOException ioe)
       {  System.out.println("Can not bind to port " + port + ": " + ioe.getMessage()); }
+   
+       
+   try
+   {
+    Class.forName("com.mysql.jdbc.Driver");
+    String username="pdpuser";
+    String password="resupdp";
+    String url="jdbc:mysql://195.251.209.12:3306/it12Score4_Chat";
+    con=DriverManager.getConnection(url,username,password);
+
+   }
+   catch(Exception e) {
+    System.out.println(e);
+   }
+   
+   
    }
    public void run()
    {  while (thread != null)
@@ -46,6 +67,37 @@ public class ChatServer implements Runnable
    }
    public synchronized void handle(int ID, String input, String property)
    {  
+	   if(property.equals("#login_verification#"))
+		{
+			try
+			{
+			Statement st=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String query ="select * from Players where Player_Name='"+input+"'";
+			ResultSet rs=st.executeQuery(query);
+			while(rs.next())
+			{
+				if(rs!=null)
+				{
+					clients[findClient(ID)].send(new Communication("You have been authenticated","#authentication#"));
+				}
+				else {
+					System.out.println("not");
+				}
+			}
+			//	rs.close();
+			st.close();
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
+			
+			
+		}
+	   
+	   
 	   if (input.equals(".bye"))
 	   {
 		   clients[findClient(ID)].send(new Communication("Public",".bye") );
