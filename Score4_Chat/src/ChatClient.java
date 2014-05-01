@@ -17,8 +17,8 @@ public class ChatClient extends Applet implements Runnable
    private DataOutputStream streamOut = null;
    private ObjectOutputStream streamOutObject = null;
    private ChatClientThread clientPublic    = null;
-   private TextArea  displayPublic = new TextArea();
-   private TextArea displayPrivate = new TextArea();
+   private TextArea  displayPublic = new TextArea(13,5);
+   private TextArea displayPrivate = new TextArea(13,5);
    private TextField inputPublic   = new TextField();
    private TextField inputPrivate = new TextField();
    private Button    sendPublic    = new Button("Public"), connect = new Button("Connect"),
@@ -99,7 +99,7 @@ public class ChatClient extends Applet implements Runnable
 		
 		//
 		// Load and track the images
-		setSize(500,285);
+		setSize(800,285);
 		tracker = new MediaTracker(this);
 		boardImg = getImage(getCodeBase(), "Res/Board.gif");
 		tracker.addImage(boardImg, 0);
@@ -126,20 +126,40 @@ public class ChatClient extends Applet implements Runnable
 		keys.add(connect);
 		Panel south = new Panel(); 
 		south.setBounds(0, 250, 400, 34);
-		south.setLayout(new BorderLayout());
-		south.add("West", keys); 
-		south.add("North", inputPrivate);  
-		south.add("East", sendPrivate);
-		south.add("East", inputPublic);
-		south.add("East", sendPrivate);
+		south.setLayout(new GridLayout(1,5));
+		south.add(keys); 
+		
+		south.add(inputPublic);
+		south.add(sendPublic);
+		south.add(inputPrivate);  
+		south.add(sendPrivate);
 		//setLayout(null);
 		
 		
 		gamePanel=new Panel(new BorderLayout());
 		//display.setBounds(200, 0, 200, 252);
-		gamePanel.add(displayPublic, BorderLayout.NORTH);
-		gamePanel.add(displayPrivate, BorderLayout.EAST);
-		gamePanel.add(south, BorderLayout.SOUTH);
+		Panel display=new Panel(new GridLayout(1,2));
+		display.add(displayPublic);
+		display.add(displayPrivate);
+		Panel helpPanel=new Panel(new GridBagLayout());
+		GridBagConstraints c= new GridBagConstraints();
+		
+		c.fill=GridBagConstraints.HORIZONTAL;
+		c.ipady=10;
+		c.gridx=0;
+		c.gridy=0;
+		//c.ipady=10;
+		helpPanel.add(display,c);
+		
+		c.ipady=0;
+		c.gridx=0;
+		c.gridy=1;
+		
+		helpPanel.add(south,c);
+		gamePanel.add(helpPanel, BorderLayout.EAST);
+		//gamePanel.add(display, BorderLayout.EAST);
+		//gamePanel.add(displayPrivate, BorderLayout.EAST);
+		//gamePanel.add(south, BorderLayout.SOUTH);
 		
 	
 		
