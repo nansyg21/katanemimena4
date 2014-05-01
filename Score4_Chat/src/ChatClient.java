@@ -75,15 +75,27 @@ public class ChatClient extends Applet implements Runnable
 		{
 			try
 			{
+				if(!authenticated)
+				{
 				System.out.println(username.getText());
-			streamOut.writeUTF("#login_verification#"+username.getText());
+				connect(serverName, serverPort);
+				streamOut.writeUTF("#login_verification#"+username.getText());
+				}
+				else
+				{
+					cl.show(cardPanel, "game");
+				}
 			}
 			
 			catch(IOException ioe)
 			{  
 				println("Sending error: " + ioe.getMessage()); close(); 
 			}
-			cl.show(cardPanel, "game");}});
+			
+			
+			}
+		}
+		);
 		loginPanel.add(loginBt);
 		
 		//
@@ -214,6 +226,10 @@ public class ChatClient extends Applet implements Runnable
 		{  
 			println("Good bye.");  
 			close(); 
+		}
+		else if(msg.equals("#authentication#"))
+		{
+			authenticated=true;
 		}
 		else 
 			println(msg); 

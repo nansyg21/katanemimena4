@@ -39,7 +39,7 @@ public ChatServer(int port)
 	}
 	catch(Exception e) {
 		
-		System.out.println(e+"nasia");
+		System.out.println(e);
 	}
 }
 
@@ -94,8 +94,22 @@ public synchronized void handle(int ID, String input)
 		try
 		{
 		Statement st=(Statement) con.createStatement();
-		String query ="select ID from Player where Player_Name ="+input;
+		//"select * from Players where Player_Name="+currentID;
+		String query ="select * from Players where Player_Name='"+input.substring(20)+"'";
 		ResultSet rs=st.executeQuery(query);
+		while(rs.next())
+		{
+			if(rs!=null)
+			{
+				clients[findClient(ID)].send("#authentication#");
+			}
+			else {
+				System.out.println("not");
+			}
+		}
+		//	rs.close();
+		st.close();
+		
 		}
 		catch(Exception e)
 		{
