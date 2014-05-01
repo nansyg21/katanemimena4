@@ -51,6 +51,7 @@ public class ChatClient extends Applet implements Runnable
    private CardLayout cl;
    private TextField username=null;
    private Boolean authenticated=false;
+   private String Player_Name=null;
 
    final static String LOGINPANEL="LOGINPANEL";
    final static String GAMEPANEL="GAMEPANEL";
@@ -78,7 +79,7 @@ public class ChatClient extends Applet implements Runnable
 			{
 				if(!authenticated)
 				{
-				System.out.println(username.getText());
+				Player_Name=username.getText();
 				connect(serverName, serverPort);
 				streamOutObject.writeObject(new Communication(username.getText(),"#login_verification#"));
 				}
@@ -348,6 +349,15 @@ public class ChatClient extends Applet implements Runnable
 	          }
 	          else if (gameState == Connect4ClientConnection.THEYWON) {
 	            status = new String("Sorry, you lose!");
+	            try
+	            {
+	            streamOutObject.writeObject(new Communication(Player_Name,"#lost_state#"));
+	            }
+	            catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}	
+	            
 	            myMove = false;
 	            gameOver = true;
 	            repaint();
@@ -486,6 +496,15 @@ public class ChatClient extends Applet implements Runnable
 	          else {
 	            sadSnd.play();
 	            status = new String("It's a tie!");
+	            try
+	            {
+	            streamOutObject.writeObject(new Communication(Player_Name,"#tie_state#"));
+	            }
+	            catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}	
+	            
 	            gameOver = true;
 	            connection.sendITIED();
 	            connection.sendMove(pos.x);
@@ -493,6 +512,15 @@ public class ChatClient extends Applet implements Runnable
 	          else {
 	            applauseSnd.play();
 	            status = new String("You won!");
+	            try
+	            {
+	            streamOutObject.writeObject(new Communication(Player_Name,"#win_state#"));
+	            }
+	            catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}	
+	            
 	            gameOver = true;
 	            connection.sendIWON();
 	            connection.sendMove(pos.x);

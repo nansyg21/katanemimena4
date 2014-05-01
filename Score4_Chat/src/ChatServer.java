@@ -111,6 +111,10 @@ public class ChatServer implements Runnable
 		   clients[1].send(new Communication(ID + ": " + input, property) );
 		  
 	   }
+	   else if(property.equals("#win_state#"))
+	   {
+		   
+	   }
       else              ////Message is for Public
          for (int i = 0; i < clientCount; i++)
             clients[i].send(new Communication(ID + ": " + input, property) );
