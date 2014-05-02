@@ -2,6 +2,8 @@ import java.net.*;
 import java.io.*;
 import java.applet.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import Score4.Connect4;
 import Score4.Connect4ClientConnection;
@@ -13,11 +15,15 @@ public class ChatClient extends Applet implements Runnable
 	}  private Socket socket              = null;
    private DataInputStream  console   = null;
    private DataOutputStream streamOut = null;
-   private ChatClientThread client    = null;
-   private TextArea  display = new TextArea();
-   private TextField input   = new TextField();
-   private Button    send    = new Button("Send"), connect = new Button("Connect"),
+   private ObjectOutputStream streamOutObject = null;
+   private ChatClientThread clientPublic    = null;
+   private TextArea  displayPublic = new TextArea(13,5);
+   private TextArea displayPrivate = new TextArea(13,5);
+   private TextField inputPublic   = new TextField();
+   private TextField inputPrivate = new TextField();
+   private Button    sendPublic    = new Button("Public"), connect = new Button("Connect"),
                      quit    = new Button("Bye");
+   private Button sendPrivate = new Button("Team");
    private String    serverName = "localhost";
    private int       serverPort = 4444;
    
@@ -38,84 +44,216 @@ public class ChatClient extends Applet implements Runnable
      Font.PLAIN, 20);
    private FontMetrics     statusMetrics;
    private Connect4ClientConnection  connection = null;
+
    //
+   private Panel cardPanel;
+   private Panel loginPanel, gamePanel;
+   private CardLayout cl;
+   private TextField username=null;
+   private Boolean authenticated=false;
+   private String Player_Name=null;
+
+   final static String LOGINPANEL="LOGINPANEL";
+   final static String GAMEPANEL="GAMEPANEL";
 
    public void init()
    { 
-	   //
-	   // Load and track the images
-	   setSize(399,285);
-	   tracker = new MediaTracker(this);
-	   boardImg = getImage(getCodeBase(), "Res/Board.gif");
-	   tracker.addImage(boardImg, 0);
-	   handImg = getImage(getCodeBase(), "Res/Hand.gif");
-	   tracker.addImage(handImg, 0);
-	   pieceImg[0] = getImage(getCodeBase(), "Res/RedPiece.gif");
-	   tracker.addImage(pieceImg[0], 0);
-	   pieceImg[1] = getImage(getCodeBase(), "Res/BluPiece.gif");
-	   tracker.addImage(pieceImg[1], 0);
-
-	   // Load the audio clips
-	   newGameSnd = getAudioClip(getCodeBase(), "Res/NewGame.au");
-	   sadSnd = getAudioClip(getCodeBase(), "Res/Sad.au");
-	   applauseSnd = getAudioClip(getCodeBase(), "Res/Applause.au");
-	   badMoveSnd = getAudioClip(getCodeBase(), "Res/BadMove.au");
-	   redSnd = getAudioClip(getCodeBase(), "Res/RedMove.au");
-	   blueSnd = getAudioClip(getCodeBase(), "Res/BlueMove.au");
-	   //
 
 
-	   Panel keys = new Panel(); keys.setLayout(new GridLayout(1,2));
-	   keys.add(quit); keys.add(connect);
-	   Panel south = new Panel(); 
-	   south.setBounds(0, 250, 400, 34);south.setLayout(new BorderLayout());
-	   south.add("West", keys); south.add("Center", input);  south.add("East", send);
-	   setLayout(null);display.setBounds(200, 0, 200, 252);
-	   add(display);  add(south);
-	   quit.disable(); send.disable(); getParameters(); }
+	   cardPanel=new Panel();
+		cl=new CardLayout();
+		cardPanel.setLayout(cl);
+		
+		this.setLayout(new BorderLayout());
+		this.add(cardPanel, BorderLayout.EAST);
+		
+		
+		//create login frame
+		loginPanel=new Panel();
+		username=new TextField("",20);
+		Button loginBt=new Button("Login");
+		loginPanel.add(username);
+		loginBt.addActionListener(new ActionListener()
+		{public void actionPerformed(ActionEvent arg0)
+		{
+			try
+			{
+				if(!authenticated)
+				{
+				Player_Name=username.getText();
+				connect(serverName, serverPort);
+				streamOutObject.writeObject(new Communication(username.getText(),"#login_verification#"));
+				}
+				else
+				{
+					cl.show(cardPanel, "game");
+				}
+			}
+			
+			catch(IOException ioe)
+			{  
+				printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+			}			
+			}
+		}
+		);
+		loginPanel.add(loginBt);
+		
+		//
+		// Load and track the images
+		setSize(800,285);
+		tracker = new MediaTracker(this);
+		boardImg = getImage(getCodeBase(), "Res/Board.gif");
+		tracker.addImage(boardImg, 0);
+		handImg = getImage(getCodeBase(), "Res/Hand.gif");
+		tracker.addImage(handImg, 0);
+		pieceImg[0] = getImage(getCodeBase(), "Res/RedPiece.gif");
+		tracker.addImage(pieceImg[0], 0);
+		pieceImg[1] = getImage(getCodeBase(), "Res/BluPiece.gif");
+		tracker.addImage(pieceImg[1], 0);
+
+		// Load the audio clips
+		newGameSnd = getAudioClip(getCodeBase(), "Res/NewGame.au");
+		sadSnd = getAudioClip(getCodeBase(), "Res/Sad.au");
+		applauseSnd = getAudioClip(getCodeBase(), "Res/Applause.au");
+		badMoveSnd = getAudioClip(getCodeBase(), "Res/BadMove.au");
+		redSnd = getAudioClip(getCodeBase(), "Res/RedMove.au");
+		blueSnd = getAudioClip(getCodeBase(), "Res/BlueMove.au");
+		//
+
+
+		Panel keys = new Panel();
+		keys.setLayout(new GridLayout(1,2));
+		keys.add(quit); 
+		keys.add(connect);
+		Panel south = new Panel(); 
+		south.setBounds(0, 250, 400, 34);
+		south.setLayout(new GridLayout(1,5));
+		south.add(keys); 
+		
+		south.add(inputPublic);
+		south.add(sendPublic);
+		south.add(inputPrivate);  
+		south.add(sendPrivate);
+		//setLayout(null);
+		
+		
+		gamePanel=new Panel(new BorderLayout());
+		//display.setBounds(200, 0, 200, 252);
+		Panel display=new Panel(new GridLayout(1,2));
+		display.add(displayPublic);
+		display.add(displayPrivate);
+		Panel helpPanel=new Panel(new GridBagLayout());
+		GridBagConstraints c= new GridBagConstraints();
+		
+		c.fill=GridBagConstraints.HORIZONTAL;
+		c.ipady=10;
+		c.gridx=0;
+		c.gridy=0;
+		//c.ipady=10;
+		helpPanel.add(display,c);
+		
+		c.ipady=0;
+		c.gridx=0;
+		c.gridy=1;
+		
+		helpPanel.add(south,c);
+		gamePanel.add(helpPanel, BorderLayout.EAST);
+		//gamePanel.add(display, BorderLayout.EAST);
+		//gamePanel.add(displayPrivate, BorderLayout.EAST);
+		//gamePanel.add(south, BorderLayout.SOUTH);
+		
+	
+		
+		cardPanel.add(loginPanel, LOGINPANEL);
+		cardPanel.add(gamePanel, "game");	
+		cl.show(cardPanel, LOGINPANEL);
+		
+		
+		//add(display);  
+	//	add(south);
+		quit.disable(); 
+		sendPublic.disable();
+		sendPrivate.disable();
+		getParameters();
+	}
+
    public boolean action(Event e, Object o)
    {  if (e.target == quit)
-   {  input.setText(".bye");
-   send();  quit.disable(); send.disable(); connect.enable(); }
-   else if (e.target == connect)
-   {  connect(serverName, serverPort); }
-   else if (e.target == send)
-   {  send(); input.requestFocus(); }
-   return true; }
+      {  inputPublic.setText(".bye");
+         send(inputPublic,null); send(inputPrivate,null);  quit.disable(); sendPublic.disable();sendPrivate.disable(); connect.enable(); }
+      else if (e.target == connect)
+      {  connect(serverName, serverPort); }
+      else if (e.target == sendPublic)
+      {  send(inputPublic, "Public"); inputPublic.requestFocus(); }
+      else if(e.target == sendPrivate)
+      {  send(inputPrivate, "Private"); inputPrivate.requestFocus(); }
+      return true; }
    public void connect(String serverName, int serverPort)
-   {  println("Establishing connection. Please wait ...");
-   try
-   {  socket = new Socket(serverName, serverPort);
-   println("Connected: " + socket);
-   open(); send.enable(); connect.disable(); quit.enable(); }
-   catch(UnknownHostException uhe)
-   {  println("Host unknown: " + uhe.getMessage()); }
-   catch(IOException ioe)
-   {  println("Unexpected exception: " + ioe.getMessage()); } }
-   private void send()
-   {  try
-   {  streamOut.writeUTF(input.getText()); streamOut.flush(); input.setText(""); }
-   catch(IOException ioe)
-   {  println("Sending error: " + ioe.getMessage()); close(); } }
-   public void handle(String msg)
-   {  if (msg.equals(".bye"))
-   {  println("Good bye.");  close(); }
-   else println(msg); }
+   {  printlnPublic("Establishing connection. Please wait ...");
+      try
+      {  socket = new Socket(serverName, serverPort);
+         printlnPublic("Connected: " + socket);
+         open(); sendPublic.enable(); sendPrivate.enable(); connect.disable(); quit.enable(); }
+      catch(UnknownHostException uhe)
+      {  printlnPublic("Host unknown: " + uhe.getMessage()); }
+      catch(IOException ioe)
+      {  printlnPublic("Unexpected exception: " + ioe.getMessage()); } }
+   private void send(TextField txtField, String property)
+   { 
+	   try
+	   {
+		   Communication comm_temp = new Communication(txtField.getText(), property);
+		   txtField.setText("");
+		   // streamOut.writeUTF(txtField.getText()); streamOut.flush(); txtField.setText("");
+		   streamOutObject.writeObject(comm_temp);
+	   }  	 
+      catch(IOException ioe)
+      {  printlnPublic("Sending error: " + ioe.getMessage()); close(); } }
+
+   public void handle(String msg, String property)
+   {
+	   if (msg.equals(".bye"))
+	   { 
+		   printlnPublic("Good bye.");  close();
+	   }
+	   
+	   if (property.equals("Public")){
+		   printlnPublic(msg);
+	   }
+	   
+	   else if(property.equals("Private"))
+	   {
+		   printlnPrivate(msg); 
+	   }
+	   else if(property.equals("#authentication#"))
+	   {
+		   authenticated=true;
+	   }
+		   
+   }
    public void open()
    {  try
-   {  streamOut = new DataOutputStream(socket.getOutputStream());
-   client = new ChatClientThread(this, socket); }
-   catch(IOException ioe)
-   {  println("Error opening output stream: " + ioe); } }
+      {  streamOut = new DataOutputStream(socket.getOutputStream());
+         streamOutObject = new ObjectOutputStream(socket.getOutputStream());
+         clientPublic = new ChatClientThread(this, socket); }
+      catch(IOException ioe)
+      {  printlnPublic("Error opening output stream: " + ioe); } }
    public void close()
    {  try
-   {  if (streamOut != null)  streamOut.close();
-   if (socket    != null)  socket.close(); }
-   catch(IOException ioe)
-   {  println("Error closing ..."); }
-   client.close();  client.stop(); }
-   private void println(String msg)
-   {  display.appendText(msg + "\n"); }
+      {  if (streamOut != null)  streamOut.close();
+         if (streamOutObject != null)  streamOutObject.close();
+         if (socket    != null)  socket.close(); }
+      catch(IOException ioe)
+      {  printlnPublic("Error closing ..."); }
+      clientPublic.close();  clientPublic.stop(); }
+   private void printlnPublic(String msg)
+   {  displayPublic.appendText(msg + "\n"); }
+   
+   private void printlnPrivate(String msg)
+   {  displayPrivate.appendText(msg + "\n"); }
+   
+
    public void getParameters()
    {  serverName = getParameter("host");
    //serverPort = Integer.parseInt(getParameter("port")); 
@@ -146,98 +284,109 @@ public class ChatClient extends Applet implements Runnable
 		   return;
 	   }
 
-	   try {
-		   // Create the connection
-		   connection = new Connect4ClientConnection(this);
-		   while (connection.isConnected()) {
-			   int istatus = connection.getTheirMove();
-			   if (istatus == Connect4ClientConnection.GAMEOVER) {
-				   myMove = false;
-				   gameState = 0;
-				   return;
-			   }
-			   // Wait for the other player
-			   else if (istatus == Connect4ClientConnection.PLSWAIT) {
-				   if (gameState == 0) {
-					   gameState = Connect4ClientConnection.PLSWAIT;
-					   status = new String("Wait for player");
-					   repaint();
-				   } else {
-					   System.out.println("Gameflow error!");
-					   return;
-				   }
-			   }
-			   else if (istatus == Connect4ClientConnection.THEIRTURN) {
-				   status = new String("Their turn.");
-				   myMove = false;
-				   gameState = Connect4ClientConnection.THEIRTURN;
-				   repaint();
-			   }
-			   else if (istatus == Connect4ClientConnection.YOURTURN) {
-				   gameState = Connect4ClientConnection.YOURTURN;
-				   status = new String("Your turn.");
-				   repaint();
-				   myMove = true;
-			   }
-			   else if (istatus == Connect4ClientConnection.THEYWON) {
-				   gameState = Connect4ClientConnection.THEYWON;
-			   }
-			   else if (istatus == Connect4ClientConnection.THEYQUIT) {
-				   gameState = Connect4ClientConnection.THEYQUIT;
-				   status = new String("Opponent Quit!");
-				   myMove = false;
-				   repaint();
-				   return;
-			   }
-			   else if (istatus == Connect4ClientConnection.THEYTIED) {
-				   gameState = Connect4ClientConnection.THEYTIED;
-			   }
-			   else if (istatus == Connect4ClientConnection.ERROR) {
-				   System.out.println("error!");
-				   gameState = Connect4ClientConnection.ERROR;
-				   status = new String("Error! Game Over");
-				   myMove = false;
-				   repaint();
-				   return;
-			   }
-			   else {
-				   if (gameState == Connect4ClientConnection.THEIRTURN) {
-					   // Note that we make the move, but wait for the *server*
-					   // to say YOURTURN before we change the status. Otherwise,
-					   // we have a race condition - if the player moves before
-					   // the server says YOURTURN, we go back into that mode,
-					   // allowing the player to make two turns in a row!
-					   Point pos = gameEngine.makeMove(1, istatus);
-					   blueSnd.play();
-					   repaint();
-				   }
-				   else if (gameState == Connect4ClientConnection.THEYWON) {
-					   status = new String("Sorry, you lose!");
-					   myMove = false;
-					   gameOver = true;
-					   repaint();
-					   sadSnd.play();
-					   return;
-				   }
-				   else if (gameState == Connect4ClientConnection.THEYTIED) {
-					   status = new String("Tie game!");
-					   myMove = false;
-					   gameOver = true;
-					   repaint();
-					   sadSnd.play();
-					   return;
-				   }
-				   else {
-					   System.out.println("Gameflow error!");
-					   return;
-				   }
-			   }
-		   }
-	   }
-	   catch (IOException e) {
-		   System.out.println("IOException: "+e);
-	   }
-   }
+
+	    try {
+	      // Create the connection
+	      connection = new Connect4ClientConnection(this);
+	      while (connection.isConnected()) {
+	        int istatus = connection.getTheirMove();
+	        if (istatus == Connect4ClientConnection.GAMEOVER) {
+	          myMove = false;
+	          gameState = 0;
+	          return;
+	        }
+	        // Wait for the other player
+	        else if (istatus == Connect4ClientConnection.PLSWAIT) {
+	          if (gameState == 0) {
+	            gameState = Connect4ClientConnection.PLSWAIT;
+	            status = new String("Wait for player");
+	            repaint();
+	          } else {
+	            System.out.println("Gameflow error!");
+	            return;
+	          }
+	        }
+	        else if (istatus == Connect4ClientConnection.THEIRTURN) {
+	          status = new String("Their turn.");
+	          myMove = false;
+	          gameState = Connect4ClientConnection.THEIRTURN;
+	          repaint();
+	        }
+	        else if (istatus == Connect4ClientConnection.YOURTURN) {
+	          gameState = Connect4ClientConnection.YOURTURN;
+	          status = new String("Your turn.");
+	          repaint();
+	          myMove = true;
+	        }
+	        else if (istatus == Connect4ClientConnection.THEYWON) {
+	          gameState = Connect4ClientConnection.THEYWON;
+	        }
+	        else if (istatus == Connect4ClientConnection.THEYQUIT) {
+	          gameState = Connect4ClientConnection.THEYQUIT;
+	          status = new String("Opponent Quit!");
+	          myMove = false;
+	          repaint();
+	          return;
+	        }
+	        else if (istatus == Connect4ClientConnection.THEYTIED) {
+	          gameState = Connect4ClientConnection.THEYTIED;
+	        }
+	        else if (istatus == Connect4ClientConnection.ERROR) {
+	          System.out.println("error!");
+	          gameState = Connect4ClientConnection.ERROR;
+	          status = new String("Error! Game Over");
+	          myMove = false;
+	          repaint();
+	          return;
+	        }
+	        else {
+	          if (gameState == Connect4ClientConnection.THEIRTURN) {
+	            // Note that we make the move, but wait for the *server*
+	            // to say YOURTURN before we change the status. Otherwise,
+	            // we have a race condition - if the player moves before
+	            // the server says YOURTURN, we go back into that mode,
+	            // allowing the player to make two turns in a row!
+	            Point pos = gameEngine.makeMove(1, istatus);
+	            blueSnd.play();
+	            repaint();
+	          }
+	          else if (gameState == Connect4ClientConnection.THEYWON) {
+	            status = new String("Sorry, you lose!");
+	            try
+	            {
+	            streamOutObject.writeObject(new Communication(Player_Name,"#lost_state#"));
+	            }
+	            catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}	
+	            
+	            myMove = false;
+	            gameOver = true;
+	            repaint();
+	            sadSnd.play();
+	            return;
+	          }
+	          else if (gameState == Connect4ClientConnection.THEYTIED) {
+	            status = new String("Tie game!");
+	            myMove = false;
+	            gameOver = true;
+	            repaint();
+	            sadSnd.play();
+	            return;
+	          }
+	          else {
+	            System.out.println("Gameflow error!");
+	            return;
+	          }
+	        }
+	      }
+	    }
+	    catch (IOException e) {
+	      System.out.println("IOException: "+e);
+	    }
+	  }
+
 
 
    public void update(Graphics g) {
@@ -331,44 +480,64 @@ public class ChatClient extends Applet implements Runnable
 	   return true;
    }
 
-   public boolean mouseDown(Event evt, int x, int y) {
-	   if (gameOver) {
-		   thread = null;
-		   thread = new Thread(this);
-		   thread.start();
-	   }
-	   else if (myMove) {
-		   // Make sure the move is valid
-		   Point pos = gameEngine.makeMove(0, x / 28);
-		   if (pos.y >= 0) {
-			   if (!gameEngine.isWinner(0))
-				   if (!gameEngine.isTie()) {
-					   redSnd.play();
-					   status = new String("Their turn.");
-					   connection.sendMove(pos.x);
-					   myMove = false;
-				   }
-				   else {
-					   sadSnd.play();
-					   status = new String("It's a tie!");
-					   gameOver = true;
-					   connection.sendITIED();
-					   connection.sendMove(pos.x);
-				   }
-			   else {
-				   applauseSnd.play();
-				   status = new String("You won!");
-				   gameOver = true;
-				   connection.sendIWON();
-				   connection.sendMove(pos.x);
-			   }
-			   repaint();
-		   }
-	   }
-	   else
-		   badMoveSnd.play();
-	   return true;
-   }
+
+	public boolean mouseDown(Event evt, int x, int y) {
+	    if (gameOver) {
+	      thread = null;
+	      thread = new Thread(this);
+	      thread.start();
+	    }
+	    else if (myMove) {
+	      // Make sure the move is valid
+	      Point pos = gameEngine.makeMove(0, x / 28);
+	      if (pos.y >= 0) {
+	        if (!gameEngine.isWinner(0))
+	          if (!gameEngine.isTie()) {
+	            redSnd.play();
+	            status = new String("Their turn.");
+	            connection.sendMove(pos.x);
+	            myMove = false;
+	          }
+	          else {
+	            sadSnd.play();
+	            status = new String("It's a tie!");
+	            try
+	            {
+	            streamOutObject.writeObject(new Communication(Player_Name,"#tie_state#"));
+	            }
+	            catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}	
+	            
+	            gameOver = true;
+	            connection.sendITIED();
+	            connection.sendMove(pos.x);
+	          }
+	          else {
+	            applauseSnd.play();
+	            status = new String("You won!");
+	            try
+	            {
+	            streamOutObject.writeObject(new Communication(Player_Name,"#win_state#"));
+	            }
+	            catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}	
+	            
+	            gameOver = true;
+	            connection.sendIWON();
+	            connection.sendMove(pos.x);
+	          }
+	        repaint();
+	      }
+	    }
+	    else
+	      badMoveSnd.play();
+	    return true;
+	  }
+
 
    public void newGame() {
 	   // Setup a new game
