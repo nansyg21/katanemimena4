@@ -79,7 +79,7 @@ public class ChatServer implements Runnable
 			{
 				if(rs!=null)
 				{
-					clients[findClient(ID)].setName(input);
+					clients[findClient(ID)].setname(input);
 					clients[findClient(ID)].send(new Communication("You have been authenticated","#authentication#"));
 				}
 				else {
@@ -109,21 +109,20 @@ public class ChatServer implements Runnable
 		   //FIND THE PARTNER ID BASED ON YOUR ID
 		   if(findClient(ID) %2 ==0)
 		   {//first player to join the team
-			   clients[findClient(ID)].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+			   clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
 			   try{
-				   clients[findClient(ID)+1].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+				   clients[findClient(ID)+1].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
 			   }
 			   catch(NullPointerException e){
-				   clients[findClient(ID)+1].send(new Communication("No teammate joined", property) );
+				   clients[findClient(ID)].send(new Communication("No teammate joined!!!", property) );
 			   }
 		   }
 		   else
 		   {
-			   clients[findClient(ID)].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
-			   clients[findClient(ID)-1].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+			   clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+			   clients[findClient(ID)-1].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
 		   }
 		   
-		   clients[1].send(new Communication(ID + ": " + input, property) );
 		  
 	   }
 	   else if(property.equals("#win_state#"))
@@ -132,7 +131,7 @@ public class ChatServer implements Runnable
 	   }
       else              ////Message is for Public
          for (int i = 0; i < clientCount; i++)
-            clients[i].send(new Communication(ID + ": " + input, property) );
+            clients[i].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
    }
    public synchronized void remove(String ID)
    {  int pos = findClient(ID);
