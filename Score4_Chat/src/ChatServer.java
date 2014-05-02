@@ -3,6 +3,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.io.*;
 import Score4Server.Connect4Daemon;
 
@@ -79,7 +81,7 @@ public class ChatServer implements Runnable
 			{
 				if(rs!=null)
 				{
-					clients[findClient(ID)].setName(input);
+					clients[findClient(ID)].setname(input);
 					clients[findClient(ID)].send(new Communication("You have been authenticated","#authentication#"));
 				}
 				else {
@@ -109,30 +111,85 @@ public class ChatServer implements Runnable
 		   //FIND THE PARTNER ID BASED ON YOUR ID
 		   if(findClient(ID) %2 ==0)
 		   {//first player to join the team
-			   clients[findClient(ID)].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+			   clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
 			   try{
-				   clients[findClient(ID)+1].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+				   clients[findClient(ID)+1].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
 			   }
 			   catch(NullPointerException e){
-				   clients[findClient(ID)+1].send(new Communication("No teammate joined", property) );
+				   clients[findClient(ID)].send(new Communication("No teammate joined!!!", property) );
 			   }
 		   }
 		   else
 		   {
-			   clients[findClient(ID)].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
-			   clients[findClient(ID)-1].send(new Communication(ID+clients[findClient(ID)].getname() + ": " + input, property) );
+			   clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+			   clients[findClient(ID)-1].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
 		   }
 		   
-		   clients[1].send(new Communication(ID + ": " + input, property) );
 		  
 	   }
 	   else if(property.equals("#win_state#"))
 	   {
+		   try
+			{
+			Statement st1=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String newstring = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date());
+			String query1 ="INSERT INTO Games (Name, Date, State) " + "VALUES ('"+input+"', '"+newstring+"', 'WIN')";
+			st1.executeUpdate(query1);
+			
+			//	rs.close();
+			st1.close();
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
+		   
+	   }
+	   else if(property.equals("#lost_state#"))
+	   {
+		   try
+			{
+			Statement st2=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String newstring = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date());
+			String query2 ="INSERT INTO Games (Name, Date, State) " + "VALUES ('"+input+"', '"+newstring+"', 'LOST')";
+			st2.executeUpdate(query2);
+			
+			//	rs.close();
+			st2.close();
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
+		   
+	   }
+	   else if(property.equals("#tie_state#"))
+	   {
+		   try
+			{
+			Statement st3=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String newstring = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date());
+			String query3 ="INSERT INTO Games (Name, Date, State) " + "VALUES ('"+input+"', '"+newstring+"', 'TIE')";
+			st3.executeUpdate(query3);
+			
+			//	rs.close();
+			st3.close();
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
 		   
 	   }
       else              ////Message is for Public
          for (int i = 0; i < clientCount; i++)
-            clients[i].send(new Communication(ID + ": " + input, property) );
+            clients[i].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
    }
    public synchronized void remove(String ID)
    {  int pos = findClient(ID);

@@ -12,8 +12,7 @@ public class ChatClient extends Applet implements Runnable
 {
 	public ChatClient() {
 
-	}
-
+	}  
 	private Socket socket              = null;
 	private DataInputStream  console   = null;
 	private DataOutputStream streamOut = null;
@@ -32,8 +31,9 @@ public class ChatClient extends Applet implements Runnable
 	//
 	private Image           offImage, boardImg, handImg;
 	private Image[]         pieceImg = new Image[2];
-	private AudioClip       newGameSnd, sadSnd, applauseSnd,
-	badMoveSnd, redSnd, blueSnd;
+
+	private AudioClip       newGameSnd, sadSnd, applauseSnd, badMoveSnd, redSnd, blueSnd;
+
 	private Graphics        offGrfx;
 	private Thread          thread;
 	private MediaTracker    tracker;
@@ -62,6 +62,7 @@ public class ChatClient extends Applet implements Runnable
 	{ 
 
 
+>>>>>>> upstream/master
 		cardPanel=new Panel();
 		cl=new CardLayout();
 		cardPanel.setLayout(cl);
@@ -76,29 +77,31 @@ public class ChatClient extends Applet implements Runnable
 		Button loginBt=new Button("Login");
 		loginPanel.add(username);
 		loginBt.addActionListener(new ActionListener()
-		{public void actionPerformed(ActionEvent arg0)
 		{
-			try
+			public void actionPerformed(ActionEvent arg0)
 			{
-				if(!authenticated)
+				try
 				{
-					Player_Name=username.getText();
-					connect(serverName, serverPort);
-					streamOutObject.writeObject(new Communication(username.getText(),"#login_verification#"));
-				}
-				else
-				{
-					cl.show(cardPanel, "game");
-				}
-			}
 
-			catch(IOException ioe)
-			{  
-				printlnPublic("Sending error: " + ioe.getMessage()); close(); 
-			}			
+					if(!authenticated)
+					{
+						Player_Name=username.getText();
+						connect(serverName, serverPort);
+						streamOutObject.writeObject(new Communication(username.getText(),"#login_verification#"));
+					}
+					else
+					{
+						cl.show(cardPanel, "game");
+					}
+				}
+
+				catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}			
+			}
 		}
-		}
-				);
+		);
 		loginPanel.add(loginBt);
 
 		//
@@ -181,46 +184,83 @@ public class ChatClient extends Applet implements Runnable
 	}
 
 	public boolean action(Event e, Object o)
-	{  if (e.target == quit)
-	{  inputPublic.setText(".bye");
-	send(inputPublic,null); send(inputPrivate,null);  quit.disable(); sendPublic.disable();sendPrivate.disable(); connect.enable(); }
-	else if (e.target == connect)
-	{  connect(serverName, serverPort); }
-	else if (e.target == sendPublic)
-	{  send(inputPublic, "Public"); inputPublic.requestFocus(); }
-	else if(e.target == sendPrivate)
-	{  send(inputPrivate, "Private"); inputPrivate.requestFocus(); }
-	return true; }
+	{  
+		if (e.target == quit)
+		{ 
+			inputPublic.setText(".bye");
+			send(inputPublic,null); 
+			send(inputPrivate,null);  
+			quit.disable(); 
+			sendPublic.disable();
+			sendPrivate.disable(); 
+			connect.enable();
+		}
+		else if (e.target == connect)
+		{ 
+			connect(serverName, serverPort); 
+		}
+		else if (e.target == sendPublic) //user sends public message
+		{  
+			send(inputPublic, "Public");
+			inputPublic.requestFocus();
+		}
+		else if(e.target == sendPrivate)//user writes in team
+		{ 
+			send(inputPrivate, "Private");
+			inputPrivate.requestFocus(); 
+		}
+		return true; 
+	}
 	public void connect(String serverName, int serverPort)
-	{  printlnPublic("Establishing connection. Please wait ...");
-	try
-	{  socket = new Socket(serverName, serverPort);
-	printlnPublic("Connected: " + socket);
-	open(); sendPublic.enable(); sendPrivate.enable(); connect.disable(); quit.enable(); }
-	catch(UnknownHostException uhe)
-	{  printlnPublic("Host unknown: " + uhe.getMessage()); }
-	catch(IOException ioe)
-	{  printlnPublic("Unexpected exception: " + ioe.getMessage()); } }
+	{  
+		printlnPublic("Establishing connection. Please wait ...");
+		try
+		{  socket = new Socket(serverName, serverPort);
+		printlnPublic("Connected: " + socket);
+		open(); 
+		sendPublic.enable(); 
+		sendPrivate.enable(); 
+		connect.disable(); 
+		quit.enable();
+		}
+		catch(UnknownHostException uhe)
+		{  
+			printlnPublic("Host unknown: " + uhe.getMessage());
+		}
+		catch(IOException ioe)
+		{  
+			printlnPublic("Unexpected exception: " + ioe.getMessage());
+		} 
+	}
 	private void send(TextField txtField, String property)
 	{ 
-		try
-		{
+		try //send a message and a property of a message
+		{  
+
 			Communication comm_temp = new Communication(txtField.getText(), property);
 			txtField.setText("");
 			// streamOut.writeUTF(txtField.getText()); streamOut.flush(); txtField.setText("");
 			streamOutObject.writeObject(comm_temp);
 		}  	 
 		catch(IOException ioe)
-		{  printlnPublic("Sending error: " + ioe.getMessage()); close(); } }
+
+		{ 
+			printlnPublic("Sending error: " + ioe.getMessage()); 
+			close(); 
+		} 
+	}
 
 	public void handle(String msg, String property)
 	{
 		if (msg.equals(".bye"))
 		{ 
-			printlnPublic("Good bye.");  close();
+
+			printlnPublic("Good bye.");  
+			close();
 		}
 
-		if (property.equals("Public")){
+		if (property.equals("Public"))
+		{//emfanizetai se diaforetiko analoga me to propertry 
 			printlnPublic(msg);
 		}
 
@@ -232,111 +272,152 @@ public class ChatClient extends Applet implements Runnable
 		{
 			authenticated=true;
 		}
-
 	}
-	public void open(){
-		try {
+	
+	public void open()
+	{ 
+		try
+		{ 
 			streamOut = new DataOutputStream(socket.getOutputStream());
 			streamOutObject = new ObjectOutputStream(socket.getOutputStream());
 			clientPublic = new ChatClientThread(this, socket); 
-		} catch(IOException ioe) {  printlnPublic("Error opening output stream: " + ioe); } 
+		}
+		catch(IOException ioe)
+		{ 
+			printlnPublic("Error opening output stream: " + ioe);
+		} 
 	}
-	
-	public void close(){
-		try	{
-			if (streamOut != null)  streamOut.close();
-			if (streamOutObject != null)  streamOutObject.close();
-			if (socket    != null)  socket.close(); 
-		} catch(IOException ioe) {  printlnPublic("Error closing ..."); }
-		clientPublic.close();  clientPublic.stop(); 
+	public void close()
+	{ 
+		try
+		{ 
+			if (streamOut != null) 
+				streamOut.close();
+			if (streamOutObject != null) 
+				streamOutObject.close();
+			if (socket    != null) 
+				socket.close();
+		}
+		catch(IOException ioe)
+		{ 
+			printlnPublic("Error closing ...");
+		}
+		clientPublic.close();
+		clientPublic.stop();
 	}
-	
-	private void printlnPublic(String msg)
-	{  displayPublic.appendText(msg + "\n"); }
+	private void printlnPublic(String msg) //for public TextArea
+	{  
+		displayPublic.appendText(msg + "\n"); 
+	}
 
-	private void printlnPrivate(String msg)
-	{  displayPrivate.appendText(msg + "\n"); }
-
+	private void printlnPrivate(String msg)//for private TextArea
+	{ 
+		displayPrivate.appendText(msg + "\n"); 
+	}
 
 	public void getParameters()
-	{  serverName = getParameter("host");
-	//serverPort = Integer.parseInt(getParameter("port")); 
-	serverPort = 4444;
+	{  
+		serverName = getParameter("host");
+		//serverPort = Integer.parseInt(getParameter("port")); 
+		serverPort = 4444; 
 	}
 
-	public void start() {
-		if (thread == null) {
+	public void start()
+	{
+		if (thread == null) 
+		{
 			thread = new Thread(this);
 			thread.start();
 		}
 	}
 
-	public void stop() {
-		if (thread != null) {
+
+	public void stop()
+	{
+		if (thread != null)
+		{
 			thread.stop();
 			thread = null;
 		}
 	}
 
-	public void run() {
+	public void run() 
+	{
 		// Track the images
 		int gameState = 0;
 		newGame();
-		try {
+		try 
+		{
 			tracker.waitForID(0);
 		}
-		catch (InterruptedException e) {
+		catch (InterruptedException e)
+		{
 			return;
 		}
 
-
-		try {
+		try
+		{
 			// Create the connection
 			connection = new Connect4ClientConnection(this);
-			while (connection.isConnected()) {
+			while (connection.isConnected())
+			{
 				int istatus = connection.getTheirMove();
-				if (istatus == Connect4ClientConnection.GAMEOVER) {
+				if (istatus == Connect4ClientConnection.GAMEOVER) 
+				{
 					myMove = false;
 					gameState = 0;
 					return;
 				}
 				// Wait for the other player
-				else if (istatus == Connect4ClientConnection.PLSWAIT) {
-					if (gameState == 0) {
+				else if (istatus == Connect4ClientConnection.PLSWAIT) 
+				{
+					if (gameState == 0) 
+					{
 						gameState = Connect4ClientConnection.PLSWAIT;
 						status = new String("Wait for player");
 						repaint();
-					} else {
+					} 
+					else
+					{
 						System.out.println("Gameflow error!");
 						return;
 					}
 				}
-				else if (istatus == Connect4ClientConnection.THEIRTURN) {
+				else if (istatus == Connect4ClientConnection.THEIRTURN)
+				{
+
 					status = new String("Their turn.");
 					myMove = false;
 					gameState = Connect4ClientConnection.THEIRTURN;
 					repaint();
 				}
-				else if (istatus == Connect4ClientConnection.YOURTURN) {
+				else if (istatus == Connect4ClientConnection.YOURTURN)
+				{
 					gameState = Connect4ClientConnection.YOURTURN;
 					status = new String("Your turn.");
 					repaint();
 					myMove = true;
 				}
-				else if (istatus == Connect4ClientConnection.THEYWON) {
+
+				else if (istatus == Connect4ClientConnection.THEYWON) 
+				{
 					gameState = Connect4ClientConnection.THEYWON;
 				}
-				else if (istatus == Connect4ClientConnection.THEYQUIT) {
+				else if (istatus == Connect4ClientConnection.THEYQUIT)
+				{
+
 					gameState = Connect4ClientConnection.THEYQUIT;
 					status = new String("Opponent Quit!");
 					myMove = false;
 					repaint();
 					return;
 				}
-				else if (istatus == Connect4ClientConnection.THEYTIED) {
+				else if (istatus == Connect4ClientConnection.THEYTIED)
+				{
 					gameState = Connect4ClientConnection.THEYTIED;
 				}
-				else if (istatus == Connect4ClientConnection.ERROR) {
+				else if (istatus == Connect4ClientConnection.ERROR)
+				{
 					System.out.println("error!");
 					gameState = Connect4ClientConnection.ERROR;
 					status = new String("Error! Game Over");
@@ -344,9 +425,11 @@ public class ChatClient extends Applet implements Runnable
 					repaint();
 					return;
 				}
-				else {
-					if (gameState == Connect4ClientConnection.THEIRTURN) {
-						// Note that we make the move, but wait for the *server*
+				else
+				{
+					if (gameState == Connect4ClientConnection.THEIRTURN) 
+					{
+      				    // Note that we make the move, but wait for the *server*
 						// to say YOURTURN before we change the status. Otherwise,
 						// we have a race condition - if the player moves before
 						// the server says YOURTURN, we go back into that mode,
@@ -355,7 +438,8 @@ public class ChatClient extends Applet implements Runnable
 						blueSnd.play();
 						repaint();
 					}
-					else if (gameState == Connect4ClientConnection.THEYWON) {
+					else if (gameState == Connect4ClientConnection.THEYWON)
+					{
 						status = new String("Sorry, you lose!");
 						try
 						{
@@ -372,7 +456,8 @@ public class ChatClient extends Applet implements Runnable
 						sadSnd.play();
 						return;
 					}
-					else if (gameState == Connect4ClientConnection.THEYTIED) {
+					else if (gameState == Connect4ClientConnection.THEYTIED)
+					{
 						status = new String("Tie game!");
 						myMove = false;
 						gameOver = true;
@@ -380,23 +465,25 @@ public class ChatClient extends Applet implements Runnable
 						sadSnd.play();
 						return;
 					}
-					else {
+					else 
+					{
 						System.out.println("Gameflow error!");
 						return;
 					}
 				}
 			}
 		}
-		catch (IOException e) {
+		catch (IOException e)
+		{
 			System.out.println("IOException: "+e);
 		}
 	}
 
-
-
-	public void update(Graphics g) {
+	public void update(Graphics g)
+	{
 		// Create the offscreen graphics context
-		if (offGrfx == null) {
+		if (offGrfx == null) 
+		{
 			offImage = createImage(size().width, size().height);
 			offGrfx = offImage.getGraphics();
 			statusMetrics = offGrfx.getFontMetrics(statusFont);
@@ -409,7 +496,8 @@ public class ChatClient extends Applet implements Runnable
 		int[][] board = gameEngine.getBoard();
 		for (int i = 0; i < 7; i++)
 			for (int j = 0; j < 6; j++)
-				switch(board[i][j]) {
+				switch(board[i][j]) 
+				{
 				case 0:
 					offGrfx.drawImage(pieceImg[0], (i + 1) * 4 + i *
 							pieceImg[0].getWidth(this), (6 - j) * 4 + (5 - j) *
@@ -448,18 +536,22 @@ public class ChatClient extends Applet implements Runnable
 		g.drawImage(offImage, 0, 0, null);
 	}
 
-	public void paint(Graphics g) {
-		if ((tracker.statusID(0, true) & MediaTracker.ERRORED) != 0) {
+	public void paint(Graphics g) 
+	{
+		if ((tracker.statusID(0, true) & MediaTracker.ERRORED) != 0)
+		{
 			// Draw the error rectangle
 			g.setColor(Color.red);
 			g.fillRect(0, 0, size().width, size().height);
 			return;
 		}
-		if ((tracker.statusID(0, true) & MediaTracker.COMPLETE) != 0) {
+		if ((tracker.statusID(0, true) & MediaTracker.COMPLETE) != 0)
+		{
 			// Draw the offscreen image
 			g.drawImage(offImage, 0, 0, null);
 		}
-		else {
+		else
+		{
 			// Draw the title message (while the images load)
 			Font        f1 = new Font("TimesRoman", Font.BOLD, 28),
 					f2 = new Font("Helvetica", Font.PLAIN, 16);
@@ -475,24 +567,27 @@ public class ChatClient extends Applet implements Runnable
 					size().height - fm2.getHeight() - fm2.getAscent());
 		}
 	}
-
-	public boolean mouseMove(Event evt, int x, int y) {
+	public boolean mouseMove(Event evt, int x, int y) 
+	{
 		// Update the current X position (for the hand selector)
-		if (!gameOver && myMove) {
+		if (!gameOver && myMove)
+		{
+
 			curXPos = x / 28;
 			repaint();
 		}
 		return true;
 	}
-
-
-	public boolean mouseDown(Event evt, int x, int y) {
-		if (gameOver) {
+	public boolean mouseDown(Event evt, int x, int y) 
+	{
+		if (gameOver) 
+		{
 			thread = null;
 			thread = new Thread(this);
 			thread.start();
 		}
-		else if (myMove) {
+		else if (myMove) 
+		{
 			// Make sure the move is valid
 			Point pos = gameEngine.makeMove(0, x / 28);
 			if (pos.y >= 0) {
@@ -503,7 +598,8 @@ public class ChatClient extends Applet implements Runnable
 						connection.sendMove(pos.x);
 						myMove = false;
 					}
-					else {
+					else
+					{
 						sadSnd.play();
 						status = new String("It's a tie!");
 						try
@@ -519,7 +615,8 @@ public class ChatClient extends Applet implements Runnable
 						connection.sendITIED();
 						connection.sendMove(pos.x);
 					}
-				else {
+				else 
+				{
 					applauseSnd.play();
 					status = new String("You won!");
 					try
@@ -542,9 +639,8 @@ public class ChatClient extends Applet implements Runnable
 			badMoveSnd.play();
 		return true;
 	}
-
-
-	public void newGame() {
+	public void newGame() 
+	{
 		// Setup a new game
 		status = new String("Connecting");
 		newGameSnd.play();

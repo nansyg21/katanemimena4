@@ -4,13 +4,13 @@ import java.io.*;
 public class ChatServerThread extends Thread
 {  private ChatServer       server    = null;
    private Socket           socket    = null;
-   private String           ID        =""+ -1;
-   private String           Name      = " ";
+   private String           ID        =""+ -1;//String, NOT int
+   private String           Name      = " "; //proairetiko pedio
    private DataInputStream  streamIn  =  null;
    private ObjectInputStream streamInObject = null;
    private DataOutputStream streamOut = null;
    private ObjectOutputStream streamOutObject = null;
-   private String           property  = null;
+   private String           property  = null;//added
 
    public ChatServerThread(ChatServer _server, Socket _socket )
    {  super();
@@ -60,7 +60,8 @@ public void run()
       while (true)
       {  try
          {  //server.handle(ID, streamIn.readUTF());
-    	      Communication comm_temp = (Communication)streamInObject.readObject();
+    	       //accept Serializable object
+      	      Communication comm_temp = (Communication)streamInObject.readObject();
     	      server.handle(ID, comm_temp.getMessage(), comm_temp.getProperty());
          }
          catch(IOException ioe)
