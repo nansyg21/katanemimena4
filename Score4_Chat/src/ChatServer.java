@@ -77,6 +77,11 @@ public class ChatServer implements Runnable
 			//"select * from Players where Player_Name="+currentID;
 			String query ="select * from Players where Player_Name='"+input+"'";
 			ResultSet rs=st.executeQuery(query);
+			
+			if (!rs.isBeforeFirst() ) {    
+				clients[findClient(ID)].send(new Communication("You are not a member","#not_authentication#"));
+				} 
+			
 			while(rs.next())
 			{
 				if(rs!=null)
@@ -85,7 +90,7 @@ public class ChatServer implements Runnable
 					clients[findClient(ID)].send(new Communication("You have been authenticated","#authentication#"));
 				}
 				else {
-					System.out.println("not");
+					clients[findClient(ID)].send(new Communication("You are not a member","#not_authentication#"));
 				}
 			}
 			//	rs.close();
@@ -99,7 +104,40 @@ public class ChatServer implements Runnable
 			
 			
 		}
-	   
+	   else if(property.equals("#register#"))
+		{
+			try
+			{
+			Statement st4=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String query4 ="select * from Players where Player_Name='"+input+"'";
+			ResultSet rs4=st4.executeQuery(query4);
+			
+			if (!rs4.isBeforeFirst() ) {    
+				clients[findClient(ID)].send(new Communication("Register Successful","#authentication#"));
+				Statement st5=(Statement) con.createStatement();
+				query4="INSERT INTO Players " + "VALUES ('"+input+"')";
+				st5.executeUpdate(query4);
+				st5.close();
+				}
+			else
+			{
+				clients[findClient(ID)].send(new Communication("The username exists","#not_authentication#"));
+			}
+			
+			
+			//	rs.close();
+			st4.close();
+			
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
+			
+			
+		}
 	   
 	   if (input.equals(".bye"))
 	   {
