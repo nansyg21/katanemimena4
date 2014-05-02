@@ -183,9 +183,9 @@ public class ChatClient extends Applet implements Runnable
          send(inputPublic,null); send(inputPrivate,null);  quit.disable(); sendPublic.disable();sendPrivate.disable(); connect.enable(); }
       else if (e.target == connect)
       {  connect(serverName, serverPort); }
-      else if (e.target == sendPublic)
+      else if (e.target == sendPublic) //user sends public message
       {  send(inputPublic, "Public"); inputPublic.requestFocus(); }
-      else if(e.target == sendPrivate)
+      else if(e.target == sendPrivate)//user writes in team
       {  send(inputPrivate, "Private"); inputPrivate.requestFocus(); }
       return true; }
    public void connect(String serverName, int serverPort)
@@ -200,8 +200,8 @@ public class ChatClient extends Applet implements Runnable
       {  printlnPublic("Unexpected exception: " + ioe.getMessage()); } }
    private void send(TextField txtField, String property)
    { 
-	   try
-	   {
+	   try //send a message and a property of a message
+	   {  
 		   Communication comm_temp = new Communication(txtField.getText(), property);
 		   txtField.setText("");
 		   // streamOut.writeUTF(txtField.getText()); streamOut.flush(); txtField.setText("");
@@ -217,7 +217,7 @@ public class ChatClient extends Applet implements Runnable
 		   printlnPublic("Good bye.");  close();
 	   }
 	   
-	   if (property.equals("Public")){
+	   if (property.equals("Public")){//emfanizetai se diaforetiko analoga me to propertry 
 		   printlnPublic(msg);
 	   }
 	   
@@ -246,10 +246,10 @@ public class ChatClient extends Applet implements Runnable
       catch(IOException ioe)
       {  printlnPublic("Error closing ..."); }
       clientPublic.close();  clientPublic.stop(); }
-   private void printlnPublic(String msg)
+   private void printlnPublic(String msg) //for public TextArea
    {  displayPublic.appendText(msg + "\n"); }
    
-   private void printlnPrivate(String msg)
+   private void printlnPrivate(String msg)//for private TextArea
    {  displayPrivate.appendText(msg + "\n"); }
    
    public void getParameters()

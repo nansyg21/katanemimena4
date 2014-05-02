@@ -39,7 +39,7 @@ public class ChatClientThread extends Thread
    {  while (true)
       {  try
          { // client.handle(streamIn.readUTF());
-    	     
+    	     //accept Serializable object
               Communication comm_temp= (Communication) streamInObject.readObject();
     	     
     	      client.handle(comm_temp.getMessage(), comm_temp.getProperty()  );
