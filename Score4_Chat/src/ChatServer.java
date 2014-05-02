@@ -3,6 +3,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.io.*;
 import Score4Server.Connect4Daemon;
 
@@ -127,6 +129,62 @@ public class ChatServer implements Runnable
 	   }
 	   else if(property.equals("#win_state#"))
 	   {
+		   try
+			{
+			Statement st1=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String newstring = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date());
+			String query1 ="INSERT INTO Games (Name, Date, State) " + "VALUES ('"+input+"', '"+newstring+"', 'WIN')";
+			st1.executeUpdate(query1);
+			
+			//	rs.close();
+			st1.close();
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
+		   
+	   }
+	   else if(property.equals("#lost_state#"))
+	   {
+		   try
+			{
+			Statement st2=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String newstring = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date());
+			String query2 ="INSERT INTO Games (Name, Date, State) " + "VALUES ('"+input+"', '"+newstring+"', 'LOST')";
+			st2.executeUpdate(query2);
+			
+			//	rs.close();
+			st2.close();
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
+		   
+	   }
+	   else if(property.equals("#tie_state#"))
+	   {
+		   try
+			{
+			Statement st3=(Statement) con.createStatement();
+			//"select * from Players where Player_Name="+currentID;
+			String newstring = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date());
+			String query3 ="INSERT INTO Games (Name, Date, State) " + "VALUES ('"+input+"', '"+newstring+"', 'TIE')";
+			st3.executeUpdate(query3);
+			
+			//	rs.close();
+			st3.close();
+			
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
 		   
 	   }
       else              ////Message is for Public
