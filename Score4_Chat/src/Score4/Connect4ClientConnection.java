@@ -23,6 +23,7 @@ public class Connect4ClientConnection extends SocketAction {
 	public  static final int THEYQUIT = -6;
 	public  static final int THEYTIED = -7;
   public static final int GAMEOVER = -8;
+  public static final int TEAMMATE = -9;
 
   //takes an Applet to get ip and port
   public Connect4ClientConnection(Applet a) throws IOException {

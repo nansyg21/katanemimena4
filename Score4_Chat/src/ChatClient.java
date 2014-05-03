@@ -409,6 +409,13 @@ public class ChatClient extends Applet implements Runnable
 					gameState = Connect4ClientConnection.THEIRTURN;
 					repaint();
 				}
+				else if (istatus == Connection4ClientConnection.TEAMMATE)
+				{
+					status = new String("Teammate turn.");
+					myMove = false;
+					gameState = Connect4ClientConnection.TEAMMATE;
+					repaint();
+				}
 				else if (istatus == Connect4ClientConnection.YOURTURN)
 				{
 					gameState = Connect4ClientConnection.YOURTURN;
@@ -454,6 +461,12 @@ public class ChatClient extends Applet implements Runnable
 						// allowing the player to make two turns in a row!
 						Point pos = gameEngine.makeMove(1, istatus);
 						blueSnd.play();
+						repaint();
+					}
+					else if (gameState == Connect4ClientConnection.TEAMMATE) 
+					{
+						Point pos = gameEngine.makeMove(0, istatus);
+						redSnd.play();
 						repaint();
 					}
 					else if (gameState == Connect4ClientConnection.THEYWON)
