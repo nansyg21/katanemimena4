@@ -11,6 +11,6 @@ package Score4Server;
 class Connect4Server {
   public static void main(String args[]) {
     System.out.println("NetConnect4 server up and running...");
-    new Connect4Daemon().start();
+   // new Connect4Daemon().start();
   }
 }
