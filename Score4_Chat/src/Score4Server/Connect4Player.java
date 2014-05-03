@@ -16,14 +16,23 @@ import java.io.*;
 
 public class Connect4Player extends SocketAction {
   private Connect4Daemon daemon = null;
+  private int PlayerNum=0;
 
-  public Connect4Player(Connect4Daemon server, Socket sock) {
+  public Connect4Player(Connect4Daemon server, Socket sock, int p) {
     super(sock);
     daemon = server;
+    PlayerNum=p;
   }
 
   public void run() {
+	 if(PlayerNum==2)
+	 {
     daemon.waitForGame(this).playGame(this);
+	 }
+	 else if(PlayerNum==4)
+	 {
+		 daemon.waitForGame4(this).playGame4(this);
+	}
   }
 
   public void closeConnections() {
