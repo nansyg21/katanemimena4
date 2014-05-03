@@ -13,7 +13,10 @@ import Score4.Connect4Engine;
 public class ChatClient extends Applet implements Runnable
 {
 	public ChatClient() {
-
+		/* Every player has its own ChatClient
+		 * maybe the different ChatClientThread exist
+		 * for new games
+		 */
 	}  
 	private Socket socket              = null;
 	private DataInputStream  console   = null;

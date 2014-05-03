@@ -22,7 +22,7 @@ public class Connect4Player extends SocketAction {
     daemon = server;
   }
 
-  public void run() {
+  public void run(int mode) {
     daemon.waitForGame(this).playGame(this);
   }
 

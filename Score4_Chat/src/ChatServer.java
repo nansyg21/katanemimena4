@@ -267,7 +267,7 @@ public class ChatServer implements Runnable
     //  else
       server = new ChatServer(4444);
 
-
+      //to-do: prosthesw orisma pou upodeiknuei 2 'h 4
       new Connect4Daemon().start();
    }
 

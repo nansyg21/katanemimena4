@@ -39,7 +39,10 @@ public class Game {
 	  team1.add(players.get(1));
 	  team1.add(players.get(3));
 	  team2.add(players.get(2));
-	  team2.add(players.get(4));	  
+	  team2.add(players.get(4));
+	  player1 = players.get(1); 	//this is for not breaking the getStatus
+	  p1Queue = new Vector(10,10);
+	  p2Queue = new Vector(10,10);
   }
 
   public void playGame(Connect4Player me) {
@@ -58,8 +61,8 @@ public class Game {
 
       while (playgame) {
         if (!theirturn) {
-          me.send("YOURTURN");
-          instr = me.receive();
+          me.send("YOURTURN"); 		//me = the client of the current player and this message tells player that it's his turn
+          instr = me.receive();		//receive players move
           instr = instr.toUpperCase();
           instr = instr.trim();
           if (instr.startsWith("IQUIT")) {
@@ -139,7 +142,73 @@ public class Game {
       System.exit(1);
     }
   }
+  
+  public void playGame4(Connect4Player me) {
+	  	String instr;
+	    boolean playgame = true;
+	    boolean theirturn = false;
+	    boolean tmTurn = false; 		//teammate turn flag
+	    
+	    try {
+	    	if (team1.contains(me)) {
+	    		if (team1.indexOf(me) == 2) { //index 2 position 3
+	    			tmTurn = true;
+	    			System.out.println(me.getId()+"I'm player 3"); //just for debugging
+	    		}
+	    	}
+	    	else if (team2.contains(me)) {
+	    		theirturn = true;
+	    		System.out.println(me.getId()+"I'm in team 2"); 
+	    	} else {
+	    		System.out.println("Illegal call to playGame!");
+	            return;
+	    	}
+	    	
+	    	while (playgame) {
+	            if (!theirturn && !tmTurn) {
+	              me.send("YOURTURN"); 		//me = the client of the current player and this message tells player that it's his turn
+	              instr = me.receive();		//receive players move
+	              instr = instr.toUpperCase();
+	              instr = instr.trim();
+	              if (instr.startsWith("IQUIT")) {
+	                sendStatus(me, IQUIT);
+	                playgame = false;
+	              }
+	              else if (instr.startsWith("IWON")) {
+	                sentString = me.receive();
+	                sentString = sentString.toUpperCase();
+	                sentString = sentString.trim();
+	                sendStatus(me, IWON);
+	                sendStatus(me, SENTSTRING);
+	                playgame = false;
+	              }
+	              else if (instr.startsWith("ITIED")) {
+	                sentString = me.receive();
+	                sentString = sentString.toUpperCase();
+	                sentString = sentString.trim();
+	                sendStatus(me, ITIED);
+	                sendStatus(me, SENTSTRING);
+	              }
+	              else {
+	                sentString = instr;
+	                sendStatus(me, SENTSTRING);
+	              }
+	            } else {
+	                theirturn = false;
+	                tmTurn = true; 		//next time the teammate plays
+	            }
+	            
+	            if (playgame) {
+	            	if(tmTurn) {
+	            		
+	            	}
+	            }
+	            
+	    	}
+	    }
+  }
 
+  //as soon as there is a message from the other player it gets read, or else the thread sleeps
   private synchronized int getStatus(Connect4Player me) {
     Vector ourVector = ((me == player1) ? p1Queue : p2Queue);
     while (ourVector.isEmpty()) {
@@ -168,9 +237,16 @@ public class Game {
     }
   }
 
+  // puts a message in the vector queue as soon as the current player made its move
   private synchronized void sendStatus(Connect4Player me, int message) {
     Vector theirVector = ((me == player1) ?  p2Queue : p1Queue);
     theirVector.addElement(new Integer(message));
     notify();
+  }
+  
+  private synchronized void sendStatus4(Connect4Player me, int message) {
+	  Vector theirVector = ((team1.contains(me)) ?  p2Queue : p1Queue);
+	  theirVector.addElement(new Integer(message));
+	  notify();
   }
 }
