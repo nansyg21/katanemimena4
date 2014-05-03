@@ -72,7 +72,8 @@ public class ChatClient extends Applet implements Runnable
 		//create login frame
 		loginPanel=new Panel();
 		username=new TextField("",20);
-		Button loginBt=new Button("Login");
+		Button loginBt=new Button("Login 2Player");
+		Button login4Bt=new Button("Login 4Player");
 		loginPanel.add(username);
 		loginBt.addActionListener(new ActionListener()
 		{
@@ -101,6 +102,34 @@ public class ChatClient extends Applet implements Runnable
 		}
 				);
 		loginPanel.add(loginBt);
+		
+		login4Bt.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0)
+			{
+				try
+				{
+					if(!authenticated)
+					{
+						Player_Name=username.getText();
+						connect(serverName, serverPort);
+						streamOutObject.writeObject(new Communication(username.getText(),"#login_verification#"));
+					}
+					else
+					{
+						cl.show(cardPanel, "game");
+						repaint();
+					}
+				}
+
+				catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}			
+			}
+		}
+				);
+		loginPanel.add(login4Bt);
 
 		//
 		// Load and track the images
