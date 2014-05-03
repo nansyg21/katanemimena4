@@ -9,6 +9,7 @@ package Score4Server;
 
 // Imports
 import java.net.*;
+import java.util.ArrayList;
 import java.io.*;
 
 public class Connect4Daemon extends Thread {
@@ -16,6 +17,7 @@ public class Connect4Daemon extends Thread {
   private ServerSocket    port;
   private Connect4Player  playerWaiting = null;
   private Game            thisGame = null;
+  private ArrayList<Connect4Player>  players = new ArrayList<Connect4Player>();
 
   public Connect4Daemon() {
     super("Connect4Daemon");
@@ -73,7 +75,34 @@ public class Connect4Daemon extends Thread {
       notify();
       return retval;
     }
-  } 
+  }
+  
+  public synchronized Game waitForGame4(Connect4Player p) {
+	  Game retval = null;
+	  boolean gameReady = false;
+	  if (players.size() < 4) {
+		  thisGame = null; 		//just in case!
+		  p.send("PLSWAIT");
+		  players.add(p);
+		  while (!gameReady) {	//spin lock the thread
+			  try {
+				  wait();
+			  } catch (InterruptedException e) {
+				  System.out.println("Error in waitForGame4 : "+e);
+			  }
+		  }
+		  return thisGame;
+	  }
+	  else {
+		  thisGame = new Game(players);
+		  retval = thisGame;
+		  notifyAll();
+		  gameReady = true;
+		  players.clear();
+		  return retval;
+	  }
+	  
+  }
 
   protected void finalize() {
     if (port != null) {

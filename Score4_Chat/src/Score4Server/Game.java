@@ -20,6 +20,9 @@ public class Game {
   public static final int SENTSTRING = -6;
   private Connect4Player  player1 = null;
   private Connect4Player  player2 = null;
+  private ArrayList<Connect4Player>  players = new ArrayList<Connect4Player>();
+  private ArrayList<Connect4Player>  team1 = new ArrayList<Connect4Player>();
+  private ArrayList<Connect4Player>  team2 = new ArrayList<Connect4Player>();
   private Vector          p1Queue = null;
   private Vector          p2Queue = null;
   private String          sentString;
@@ -27,8 +30,16 @@ public class Game {
   public Game(Connect4Player p1, Connect4Player p2) {
     player1 = p1;
     player2 = p2;
-    p1Queue = new Vector(10,10);
+    p1Queue = new Vector(10,10); //Vector(int size, int incr)
     p2Queue = new Vector(10,10);
+  }
+  
+  public Game(ArrayList<Connect4Player> players) {
+	  this.players = players;
+	  team1.add(players.get(1));
+	  team1.add(players.get(3));
+	  team2.add(players.get(2));
+	  team2.add(players.get(4));	  
   }
 
   public void playGame(Connect4Player me) {

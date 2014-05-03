@@ -64,7 +64,7 @@ public class ChatClient extends Applet implements Runnable
 	{ 
 
 
->>>>>>> upstream/master
+
 		cardPanel=new Panel();
 		cl=new CardLayout();
 		cardPanel.setLayout(cl);
@@ -275,8 +275,6 @@ public class ChatClient extends Applet implements Runnable
 		{
 			authenticated=true;
 		}
-<<<<<<< HEAD
-=======
 		else if(property.equals("#not_authentication#"))
 		{
 			String s=(String) JOptionPane.showInputDialog(msg+" Please register by giving your username");
@@ -289,8 +287,6 @@ public class ChatClient extends Applet implements Runnable
 				printlnPublic("Sending error: " + ioe.getMessage()); close(); 
 			}	
 		}
-
->>>>>>> upstream/master
 	}
 	
 	public void open()
