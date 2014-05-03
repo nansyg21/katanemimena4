@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JOptionPane;
+
 import Score4.Connect4;
 import Score4.Connect4ClientConnection;
 import Score4.Connect4Engine;
@@ -92,6 +94,7 @@ public class ChatClient extends Applet implements Runnable
 					else
 					{
 						cl.show(cardPanel, "game");
+						repaint();
 					}
 				}
 
@@ -272,6 +275,22 @@ public class ChatClient extends Applet implements Runnable
 		{
 			authenticated=true;
 		}
+<<<<<<< HEAD
+=======
+		else if(property.equals("#not_authentication#"))
+		{
+			String s=(String) JOptionPane.showInputDialog(msg+" Please register by giving your username");
+			try
+			{
+				streamOutObject.writeObject(new Communication(s,"#register#"));
+			}
+			catch(IOException ioe)
+			{  
+				printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+			}	
+		}
+
+>>>>>>> upstream/master
 	}
 	
 	public void open()
@@ -481,6 +500,8 @@ public class ChatClient extends Applet implements Runnable
 
 	public void update(Graphics g)
 	{
+		if(authenticated)
+		{
 		// Create the offscreen graphics context
 		if (offGrfx == null) 
 		{
@@ -534,6 +555,7 @@ public class ChatClient extends Applet implements Runnable
 
 		// Draw the image onto the screen
 		g.drawImage(offImage, 0, 0, null);
+	}
 	}
 
 	public void paint(Graphics g) 
