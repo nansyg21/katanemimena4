@@ -158,14 +158,14 @@ public class Game {
 	    boolean teammate=false;
 
 	    try {
-	      if ((me == team1.get(0))||(me == team1.get(1))) {
+	      if ((me == team2.get(0))||(me == team2.get(1))) {
 	        theirturn = true;
 	      }
-	      else if(me == team2.get(1))
+	      else if(me == team1.get(1))
 	      {
 	    	  teammate=true;
 	      }
-	      else if (me != player1) {
+	      else if (me != team1.get(0)) {
 	        System.out.println("Illegal call to playGame!");
 	        return;
 	      }
@@ -287,17 +287,8 @@ public class Game {
   }
 
   private synchronized void sendStatus(Connect4Player me, int message) {
-	if(PlayerNum==2)
-	{
-    Vector theirVector = ((me == player1) ?  p2Queue : p1Queue);
+	Vector theirVector = ((me == player1) ?  p2Queue : p1Queue);
     theirVector.addElement(new Integer(message));
     notify();
-	}
-	else if(PlayerNum==4)
-	{
-		 Vector theirVector = ((me == player1) ?  p2Queue : p1Queue);
-		 theirVector.addElement(new Integer(message));
-		 notify();
-	}
   }
 }

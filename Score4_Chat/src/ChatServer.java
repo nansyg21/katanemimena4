@@ -322,7 +322,7 @@ public class ChatServer implements Runnable
 		server = new ChatServer(4444);
 		int pnum=server.getPlayerNumber();
 
-		new Connect4Daemon(pnum).start();
+		new Connect4Daemon(4).start();
 	}
 
 }

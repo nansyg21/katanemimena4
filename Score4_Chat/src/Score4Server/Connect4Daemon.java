@@ -22,10 +22,10 @@ public class Connect4Daemon extends Thread {
 
   public Connect4Daemon(int p) {
     super("Connect4Daemon");
+    PlayerNum=p;
     // Try to grab the port
     try {
       port = new ServerSocket(PORTNUM);
-      PlayerNum=p;
     }
     catch (IOException e) {
       System.out.println("Couldn't access port " + PORTNUM + ": " + e);
@@ -45,7 +45,7 @@ public class Connect4Daemon extends Thread {
       }
       try {
         clientSocket = port.accept();
-        new Connect4Player(this, clientSocket, PlayerNum).start();
+        new Connect4Player(this, clientSocket, 4).start();
       }
       catch (IOException e) {
         System.out.println("Couldn't connect player: " + e);
@@ -95,7 +95,7 @@ public class Connect4Daemon extends Thread {
 		  }
 		  return thisGame;
 	  }
-	  else {
+	  else if ((players.size())==4) {
 		  thisGame = new Game(players);
 		  retval = thisGame;
 		  notifyAll();
@@ -103,6 +103,7 @@ public class Connect4Daemon extends Thread {
 		  players.clear();
 		  return retval;
 	  }
+	  return thisGame;
 	  
   }
 
