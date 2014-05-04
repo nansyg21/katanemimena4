@@ -4,6 +4,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.io.*;
 import Score4Server.Connect4Daemon;
@@ -11,6 +12,7 @@ import Score4Server.Connect4Daemon;
 public class ChatServer implements Runnable
 { 
 	private ChatServerThread clients[] = new ChatServerThread[50];
+	private ArrayList<ResultTables> ResultArr =new ArrayList<ResultTables>();
 	private ServerSocket server = null;
 	private Thread       thread = null;
 	private int clientCount = 0;
@@ -294,9 +296,17 @@ public class ChatServer implements Runnable
 				clients[clientCount].start();  
 				clientCount++; 
 				
-				if(clientCount==4)
+				if(clientCount%4==0)
 				{
+					String[][] e = new String[][]{
+							 { clients[clientCount-3].getname(), "" },
+							 {  clients[clientCount-2].getname(), "" },
+							 {  clients[clientCount-1].getname(), "" },
+							 {  clients[clientCount].getname(), "" },
+					};
+					ResultArr.add(new ResultTables(e));
 				for (int i = 0; i < clientCount; i++)
+						
 					clients[i].send(new Communication("Start", "#start#"));
 				}
 			}
