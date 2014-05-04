@@ -409,7 +409,7 @@ public class ChatClient extends Applet implements Runnable
 					gameState = Connect4ClientConnection.THEIRTURN;
 					repaint();
 				}
-				else if (istatus == Connection4ClientConnection.TEAMMATE)
+				else if (istatus == Connect4ClientConnection.TEAMMATE)
 				{
 					status = new String("Teammate turn.");
 					myMove = false;

@@ -16,29 +16,27 @@ public class ChatServer implements Runnable
    private Connection con = null;
 
    public ChatServer(int port)
-   {  try
-      {  System.out.println("Binding to port " + port + ", please wait  ...");
-         server = new ServerSocket(port);  
-         System.out.println("Server started: " + server);
-         start(); }
-      catch(IOException ioe)
-      {  System.out.println("Can not bind to port " + port + ": " + ioe.getMessage()); }
-   
-       
-   try
-   {
-    Class.forName("com.mysql.jdbc.Driver");
-    String username="pdpuser";
-    String password="resupdp";
-    String url="jdbc:mysql://195.251.209.12:3306/it12Score4_Chat";
-    con=DriverManager.getConnection(url,username,password);
+   {  
+	   try {  
+		   System.out.println("Binding to port " + port + ", please wait  ...");
+		   server = new ServerSocket(port);  
+		   System.out.println("Server started: " + server);
+		   start();
+	   }
+	   catch(IOException ioe){
+		   System.out.println("Can not bind to port " + port + ": " + ioe.getMessage()); }
 
-   }
-   catch(Exception e) {
-    System.out.println(e);
-   }
-   
-   
+
+	   try {
+		   Class.forName("com.mysql.jdbc.Driver");
+		   String username="pdpuser";
+		   String password="resupdp";
+		   String url="jdbc:mysql://195.251.209.12:3306/it12Score4_Chat";
+		   con=DriverManager.getConnection(url,username,password);
+	   }
+	   catch(Exception e) {
+		   System.out.println(e);
+	   }
    }
    public void run()
    {  while (thread != null)
