@@ -52,7 +52,7 @@ public class ChatClient extends Applet implements Runnable
 	private FontMetrics     statusMetrics;
 	private Connect4ClientConnection  connection = null;
 
-	//
+	//Import elements for card panel and login frame
 	private Panel cardPanel;
 	private Panel loginPanel, gamePanel;
 	private CardLayout cl;
@@ -60,14 +60,13 @@ public class ChatClient extends Applet implements Runnable
 	private Boolean authenticated=false;
 	private String Player_Name=null;
 
+	//finals to use the different panels of card layout
 	final static String LOGINPANEL="LOGINPANEL";
 	final static String GAMEPANEL="GAMEPANEL";
 
 	public void init()
 	{ 
-
-
-
+		//Initialize card panel
 		cardPanel=new Panel();
 		cl=new CardLayout();
 		cardPanel.setLayout(cl);
@@ -76,11 +75,15 @@ public class ChatClient extends Applet implements Runnable
 		this.add(cardPanel, BorderLayout.EAST);
 
 
-		//create login frame
+		//create login frame with one textfield to fill the usename and 2 buttons to select 2 player or 4 player mode
 		loginPanel=new Panel();
 		username=new TextField("",20);
-		Button loginBt=new Button("Login");
+		Button loginBt=new Button("Login 2Player");
+		Button login4Bt=new Button("Login 4Player");
 		loginPanel.add(username);
+		/*if the 2 Player mode button is pushed and the player is not authenticated then initialize connection to server
+		and send the username the player entered to server to make the authentication to the data base
+		if the player is already authenticated then change the panel to show the game platform */ 
 		loginBt.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0)
@@ -92,7 +95,7 @@ public class ChatClient extends Applet implements Runnable
 					{
 						Player_Name=username.getText();
 						connect(serverName, serverPort);
-						streamOutObject.writeObject(new Communication(username.getText(),"#login_verification#"));
+						streamOutObject.writeObject(new Communication(username.getText(),"#login_verification2#"));
 					}
 					else
 					{
@@ -109,6 +112,37 @@ public class ChatClient extends Applet implements Runnable
 		}
 		);
 		loginPanel.add(loginBt);
+		
+		/*if the 4 Player mode button is pushed and the player is not authenticated then initialize connection to server
+		and send the username the player entered to server to make the authentication to the data base
+		if the player is already authenticated then change the panel to show the game platform */ 
+		login4Bt.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0)
+			{
+				try
+				{
+					if(!authenticated)
+					{
+						Player_Name=username.getText();
+						connect(serverName, serverPort);
+						streamOutObject.writeObject(new Communication(username.getText(),"#login_verification4#"));
+					}
+					else
+					{
+						cl.show(cardPanel, "game");
+						repaint();
+					}
+				}
+
+				catch(IOException ioe)
+				{  
+					printlnPublic("Sending error: " + ioe.getMessage()); close(); 
+				}			
+			}
+		}
+				);
+		loginPanel.add(login4Bt);
 
 		//
 		// Load and track the images
@@ -148,9 +182,8 @@ public class ChatClient extends Applet implements Runnable
 		south.add(sendPrivate);
 		//setLayout(null);
 
-
+		// form the game panel to show the game platform
 		gamePanel=new Panel(new BorderLayout());
-		//display.setBounds(200, 0, 200, 252);
 		Panel display=new Panel(new GridLayout(1,2));
 		display.add(displayPublic);
 		display.add(displayPrivate);
@@ -161,7 +194,6 @@ public class ChatClient extends Applet implements Runnable
 		c.ipady=10;
 		c.gridx=0;
 		c.gridy=0;
-		//c.ipady=10;
 		helpPanel.add(display,c);
 
 		c.ipady=0;
@@ -170,19 +202,12 @@ public class ChatClient extends Applet implements Runnable
 
 		helpPanel.add(south,c);
 		gamePanel.add(helpPanel, BorderLayout.EAST);
-		//gamePanel.add(display, BorderLayout.EAST);
-		//gamePanel.add(displayPrivate, BorderLayout.EAST);
-		//gamePanel.add(south, BorderLayout.SOUTH);
-
-
-
+		
 		cardPanel.add(loginPanel, LOGINPANEL);
-		cardPanel.add(gamePanel, "game");	
+		cardPanel.add(gamePanel, "game");
+		//the first panel to show is the login
 		cl.show(cardPanel, LOGINPANEL);
 
-
-		//add(display);  
-		//	add(south);
 		quit.disable(); 
 		sendPublic.disable();
 		sendPrivate.disable();
@@ -221,7 +246,8 @@ public class ChatClient extends Applet implements Runnable
 	{  
 		printlnPublic("Establishing connection. Please wait ...");
 		try
-		{  socket = new Socket(serverName, serverPort);
+		{
+		socket = new Socket(serverName, serverPort);
 		printlnPublic("Connected: " + socket);
 		open(); 
 		sendPublic.enable(); 
@@ -276,10 +302,15 @@ public class ChatClient extends Applet implements Runnable
 		}
 		else if(property.equals("#authentication#"))
 		{
+			//if the server has authenticated the user then authentication equals true
 			authenticated=true;
 		}
 		else if(property.equals("#not_authentication#"))
 		{
+			/*if the user is not register then a dialog box appears and the user enters the username if the username
+			 * does not exists the server authenticates the user else the user must enter a different valid and not 
+			 * in use username
+			 * */
 			String s=(String) JOptionPane.showInputDialog(msg+" Please register by giving your username");
 			try
 			{
@@ -474,6 +505,7 @@ public class ChatClient extends Applet implements Runnable
 						status = new String("Sorry, you lose!");
 						try
 						{
+							// notify the server that the player lost
 							streamOutObject.writeObject(new Communication(Player_Name,"#lost_state#"));
 						}
 						catch(IOException ioe)
@@ -514,7 +546,7 @@ public class ChatClient extends Applet implements Runnable
 	{
 		if(authenticated)
 		{
-		// Create the offscreen graphics context
+		// Create the offscreen graphics context only if the player is authenticated else show nothing
 		if (offGrfx == null) 
 		{
 			offImage = createImage(size().width, size().height);
@@ -626,7 +658,8 @@ public class ChatClient extends Applet implements Runnable
 			Point pos = gameEngine.makeMove(0, x / 28);
 			if (pos.y >= 0) {
 				if (!gameEngine.isWinner(0))
-					if (!gameEngine.isTie()) {
+					if (!gameEngine.isTie())
+					{
 						redSnd.play();
 						status = new String("Their turn.");
 						connection.sendMove(pos.x);
