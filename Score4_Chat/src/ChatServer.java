@@ -176,23 +176,50 @@ public class ChatServer implements Runnable
 		else if(property.equals("Private"))//Message is for Team
 		{
 			//FIND THE PARTNER ID BASED ON YOUR ID
-			if(findClient(ID) %2 ==0)
+			if(findClient(ID) %4 ==0)
 			{//first player to join the team
 				clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
 				try{
-					clients[findClient(ID)+1].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
-				}
+					clients[findClient(ID)+2].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+				}//prospatheise na steileis ston 2, an den exei syndethei: No teammate joined!!!
 				catch(NullPointerException e){
 					clients[findClient(ID)].send(new Communication("No teammate joined!!!", property) );
 				}
 			}
-			else
+			else if(findClient(ID) %4 ==1)//second player to join the team
 			{
 				clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
-				clients[findClient(ID)-1].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+				try{//prospatheise na steileis ston 3, an den exei syndethei: No teammate joined!!!
+					clients[findClient(ID)+2].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+				}catch(NullPointerException e)
+				{
+					clients[findClient(ID)].send(new Communication("No teammate joined!!!", property) );
+				}
+			}
+			else if(findClient(ID) %4 ==2)//third player to join the team
+			{
+				clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+				try{//prospatheise na steileis ston 1, an den exei syndethei: No teammate joined!!!
+					clients[findClient(ID)-2].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+				}catch(NullPointerException e)
+				{
+					clients[findClient(ID)].send(new Communication("No teammate joined!!!", property) );
+				}
+			}
+			else
+			{//fourth player to join the team
+				clients[findClient(ID)].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+				try{//prospatheise na steileis ston 2, an den exei syndethei: No teammate joined!!!
+					
+					clients[findClient(ID)-2].send(new Communication("("+ID+")"+clients[findClient(ID)].getname() + ": " + input, property) );
+				}catch(NullPointerException e)
+				{
+					clients[findClient(ID)].send(new Communication("No teammate joined!!!", property) );
+				}
 			}
 
 
+		
 		}
 		else if(property.equals("#win_state#"))
 		{
