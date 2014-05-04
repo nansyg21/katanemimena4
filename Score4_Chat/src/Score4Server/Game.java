@@ -50,8 +50,8 @@ public class Game {
 
       while (playgame) {
         if (!theirturn) {
-          me.send("YOURTURN");
-          instr = me.receive();
+          me.send("YOURTURN"); 		//me = the client of the current player and this message tells player that it's his turn
+          instr = me.receive();		//receive players move
           instr = instr.toUpperCase();
           instr = instr.trim();
           if (instr.startsWith("IQUIT")) {
@@ -83,8 +83,8 @@ public class Game {
         }
 
         if (playgame) {
-          me.send("THEIRTURN");
-          int stat = getStatus(me);
+          me.send("THEIRTURN");			//says the current player that its turn ended
+          int stat = getStatus(me); 	//and with this falls to wait because of its empty vector in getStatus()
           if (stat == IWON) {
             me.send("THEYWON");
             if (getStatus(me) != SENTSTRING) {
@@ -132,6 +132,7 @@ public class Game {
     }
   }
 
+//as soon as there is a message from the other player it gets read, or else the thread sleeps
   private synchronized int getStatus(Connect4Player me) {
     Vector ourVector = ((me == player1) ? p1Queue : p2Queue);
     while (ourVector.isEmpty()) {
@@ -160,6 +161,7 @@ public class Game {
     }
   }
 
+  //puts a message in the vector queue as soon as the current player made its move
   private synchronized void sendStatus(Connect4Player me, int message) {
     Vector theirVector = ((me == player1) ?  p2Queue : p1Queue);
     theirVector.addElement(new Integer(message));

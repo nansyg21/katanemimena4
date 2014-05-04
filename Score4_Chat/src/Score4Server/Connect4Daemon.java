@@ -51,7 +51,7 @@ public void run() {
       }
     }
   }
-
+//first player that enters falls to wait
   public synchronized Game waitForGame(Connect4Player p) {
     Game retval = null;
     if (playerWaiting == null) {

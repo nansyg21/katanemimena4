@@ -8,7 +8,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.io.*;
 import Score4Server.Connect4Daemon;
-
+/*
+ * This is a TEAM WORK of
+ * Nasia Mosxou , 148/12
+ * Panagiotis Kotsikoris, 121/12
+ * Angelos Arampatzis, 49/12
+ * 
+ */
 public class ChatServer implements Runnable
 { 
 	private ChatServerThread clients[] = new ChatServerThread[50];

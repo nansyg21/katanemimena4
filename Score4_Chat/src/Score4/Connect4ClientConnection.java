@@ -24,6 +24,7 @@ public class Connect4ClientConnection extends SocketAction {
 	public  static final int THEYTIED = -7;
   public static final int GAMEOVER = -8;
 
+  //takes an Applet to get ip and port
   public Connect4ClientConnection(Applet a) throws IOException {
     super(new Socket(a.getCodeBase().getHost(), PORTNUM));
   }
