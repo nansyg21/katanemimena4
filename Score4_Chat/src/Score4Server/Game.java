@@ -32,10 +32,13 @@ public class Game {
   }
 
   public void playGame(Connect4Player me) {
+	 
+	
     String instr;
     boolean playgame = true;
     boolean theirturn = false;
 
+  
     try {
       if (me == player2) {
         theirturn = true;

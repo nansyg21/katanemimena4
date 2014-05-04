@@ -292,7 +292,14 @@ public class ChatServer implements Runnable
 			{ 
 				clients[clientCount].open(); 
 				clients[clientCount].start();  
-				clientCount++; }
+				clientCount++; 
+				
+				if(clientCount==4)
+				{
+				for (int i = 0; i < clientCount; i++)
+					clients[i].send(new Communication("Start", "#start#"));
+				}
+			}
 			catch(IOException ioe)
 			{ 
 				System.out.println("Error opening thread: " + ioe); 

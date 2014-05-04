@@ -16,6 +16,7 @@ import java.io.*;
 
 public class Connect4Player extends SocketAction {
   private Connect4Daemon daemon = null;
+  
 
   public Connect4Player(Connect4Daemon server, Socket sock) {
     super(sock);
@@ -23,7 +24,7 @@ public class Connect4Player extends SocketAction {
   }
 
   public void run() {
-    daemon.waitForGame(this).playGame(this);
+	daemon.waitForGame(this).playGame(this);
   }
 
   public void closeConnections() {

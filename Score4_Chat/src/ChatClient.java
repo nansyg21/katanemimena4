@@ -54,6 +54,7 @@ public class ChatClient extends Applet implements Runnable
 	private TextField username=null;
 	private Boolean authenticated=false;
 	private String Player_Name=null;
+	private Boolean startgame=false;
 
 	//finals to use the different panels of card layout
 	final static String LOGINPANEL="LOGINPANEL";
@@ -313,6 +314,12 @@ public class ChatClient extends Applet implements Runnable
 				printlnPublic("Sending error: " + ioe.getMessage()); close(); 
 			}	
 		}
+		else if(property.equals("#start#"))
+		{
+			startgame=true;
+			repaint();
+			
+		}
 
 	}
 	public void open()
@@ -520,7 +527,7 @@ public class ChatClient extends Applet implements Runnable
 
 	public void update(Graphics g)
 	{
-		if(authenticated)
+		if(startgame)
 		{
 		// Create the offscreen graphics context only if the player is authenticated else show nothing
 		if (offGrfx == null) 

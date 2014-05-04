@@ -13,9 +13,11 @@ import java.io.*;
 
 public class Connect4Daemon extends Thread {
   public static final int PORTNUM = 1234;
+  public static int paired=0;
   private ServerSocket    port;
   private Connect4Player  playerWaiting = null;
   private Game            thisGame = null;
+  public Game waitingGame=null;
 
   public Connect4Daemon() {
     super("Connect4Daemon");
@@ -28,8 +30,8 @@ public class Connect4Daemon extends Thread {
       System.exit(1);
     }
   }
-
-  public void run() {
+  
+public void run() {
     // Even though we are functioning as a daemon in regard to the
     // game, we don't want to be declared as a daemon thread here
     // because we don't want the runtime system to kill us off.
