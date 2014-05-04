@@ -528,6 +528,7 @@ public class ChatClient extends Applet implements Runnable
 
 	public void update(Graphics g)
 	{
+		//Start game only if all the players have been registered
 		if(startgame)
 		{
 		// Create the offscreen graphics context only if the player is authenticated else show nothing

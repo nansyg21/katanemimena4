@@ -109,6 +109,7 @@ public class ChatServer implements Runnable
 					{
 						clients[findClient(ID)].setname(input);
 						clients[findClient(ID)].send(new Communication("You have been authenticated","#authentication#"));
+						//checks if the mode is for 2 or 4 players
 						if(property.equals("#login_verification2#"))
 							playerNum=2;
 						else if(property.equals("#login_verification4#"))
@@ -323,7 +324,7 @@ public class ChatServer implements Runnable
 				clients[clientCount].open(); 
 				clients[clientCount].start();  
 				clientCount++; 
-				
+				//If the player number is 4 start the game only when all the 4 players are in
 				if(playerNum==4)
 				{
 				if(clientCount%4==0)
@@ -333,6 +334,7 @@ public class ChatServer implements Runnable
 					clients[i].send(new Communication("Start", "#start#"));
 				}
 				}
+				//If the player number is 2 start the game only when all the 2 players are in
 				else if(playerNum==2)
 				{
 					if(clientCount%2==0)
