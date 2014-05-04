@@ -241,14 +241,15 @@ public class Game {
 	  notify();
   }
   
-  public void playGame4(Connect4Player me) {
+  public void playGame4() {
+	  Connect4Player me = null;
 	  String instr;
 	  boolean playgame = true;
 	  int teammate = 0;
 	  try{
 		  while(playgame) {
-			  System.out.println("9--playGame4():250 - players"+me.getId());
 			  me = players.get(turnCounter);
+			  System.out.println("9--playGame4():250 - players"+me.getId());
 
 			  me.send("YOURTURN"); 		//me = the client of the current player and this message tells player that it's his turn
 			  teammate = (turnCounter+2) % 4;
@@ -287,7 +288,7 @@ public class Game {
 			  me.send("THEIRTURN");
 			  playgame = updateOpponents((turnCounter+1)%4);
 			  playgame = updateOpponents((turnCounter+3)%4);
-			  getStatus(me);
+			  getStatus4(me);
 		  }
 	  }
 	  catch (IOException e) {

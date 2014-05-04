@@ -25,7 +25,7 @@ public class Connect4Player extends SocketAction {
   public void run() {
 	  System.out.println("4 -- Connect4Player(): 26");
    //daemon.waitForGame(this).playGame(this);
-	 daemon.waitForGame4(this).playGame4(this);
+	 daemon.waitForGame4(this).playGame4();
   }
 
   public void closeConnections() {

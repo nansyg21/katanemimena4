@@ -81,34 +81,34 @@ public class Connect4Daemon extends Thread {
   public synchronized Game waitForGame4(Connect4Player p) {
 	  Game retval = null;
 	  boolean gameReady = false;
-	  System.out.println("5 -- waitForGame(): 84 - players.size="+players.size());
-	  if (players.size() < 3) {
-		  thisGame = null; 		//just in case!
-		  p.send("PLSWAIT");
-		  System.out.println("6 -- waitForGame(): 88 - player="+p.getId());
-		  players.add(p);
-		  while (!gameReady) {	//spin lock the thread
-			  try {
-				  System.out.println("7 -- wait():91 - players.size="+players.size());
-				  wait();
-			  } catch (InterruptedException e) {
-				  System.out.println("Error in waitForGame4 : "+e);
-			  }
-		  }
-		  return thisGame;
+	  System.out.println("5 -- waitForGame4(): 84 - players.size="+players.size());
+	  thisGame = null; 		//just in case!
+	  p.send("PLSWAIT");
+	  System.out.println("6 -- waitForGame4(): 88 - player="+p.getId());
+	  players.add(p);
+	  if(players.size()>3){
+		  gameReady=true;
 	  }
-	  else {
-		  System.out.println("8 -- waitForGame(): 99 - players.size="+players.size());
-		  p.send("PLSWAIT");
-		  players.add(p);
+	  while (!gameReady) {	//spin lock the thread
+		  try {
+			  System.out.println("7 -- wait():91 - players.size="+players.size());
+			  wait();
+		  } catch (InterruptedException e) {
+			  System.out.println("Error in waitForGame4 : "+e);
+		  }
+	  }
+
+
+	  if(gameReady){
+		  System.out.println("8 -- waitForGame4():101 - players.size="+players.size());
 		  thisGame = new Game(players);
 		  retval = thisGame;
 		  notifyAll();
-		  gameReady = true;
-		  players.clear();
+		  //players.clear();
 		  return retval;
-	  }
-	  
+	  } else {
+		  return thisGame;
+	  }	  
   }
 
   protected void finalize() {
