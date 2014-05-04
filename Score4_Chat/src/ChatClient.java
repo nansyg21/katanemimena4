@@ -29,6 +29,7 @@ public class ChatClient extends Applet implements Runnable
 	private Button sendPrivate = new Button("Team");
 	private String    serverName = "localhost";
 	private int       serverPort = 4444;
+	private Team team;
 
 	//
 	private Image           offImage, boardImg, handImg;

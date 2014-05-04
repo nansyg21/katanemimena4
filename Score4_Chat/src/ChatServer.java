@@ -12,11 +12,11 @@ import Score4Server.Connect4Daemon;
 public class ChatServer implements Runnable
 { 
 	private ChatServerThread clients[] = new ChatServerThread[50];
-	private ArrayList<ResultTables> ResultArr =new ArrayList<ResultTables>();
 	private ServerSocket server = null;
 	private Thread       thread = null;
 	private int clientCount = 0;
 	private Connection con = null;
+	private int playerNum=0;
 
 	public ChatServer(int port)
 	{ 
@@ -109,10 +109,10 @@ public class ChatServer implements Runnable
 					{
 						clients[findClient(ID)].setname(input);
 						clients[findClient(ID)].send(new Communication("You have been authenticated","#authentication#"));
-						//if(property.equals("#login_verification2#")
-//------------------------------->Player number should be 2
-						//else if(property.equals("#login_verification4#"))
-//------------------------------->Player number should be 4							
+						if(property.equals("#login_verification2#"))
+							playerNum=2;
+						else if(property.equals("#login_verification4#"))
+							playerNum=4;						
 					}
 					else {
 						clients[findClient(ID)].send(new Communication("You are not a member","#not_authentication#"));
@@ -201,6 +201,7 @@ public class ChatServer implements Runnable
 			 * */
 			try
 			{
+				
 				Statement st1=(Statement) con.createStatement();
 				String newstring = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date());
 				String query1 ="INSERT INTO Games (Name, Date, State) " + "VALUES ('"+input+"', '"+newstring+"', 'WIN')";
@@ -296,18 +297,24 @@ public class ChatServer implements Runnable
 				clients[clientCount].start();  
 				clientCount++; 
 				
-				if(clientCount%4==0)
+				if(playerNum==4)
 				{
-					String[][] e = new String[][]{
-							 { clients[clientCount-3].getname(), "" },
-							 {  clients[clientCount-2].getname(), "" },
-							 {  clients[clientCount-1].getname(), "" },
-							 {  clients[clientCount].getname(), "" },
-					};
-					ResultArr.add(new ResultTables(e));
+				if(clientCount%4==0)
+				{					
 				for (int i = 0; i < clientCount; i++)
 						
 					clients[i].send(new Communication("Start", "#start#"));
+				}
+				}
+				else if(playerNum==2)
+				{
+					if(clientCount%2==0)
+					{
+						
+					for (int i = 0; i < clientCount; i++)
+							
+						clients[i].send(new Communication("Start", "#start#"));
+					}
 				}
 			}
 			catch(IOException ioe)
