@@ -310,9 +310,10 @@ public class ChatServer implements Runnable
 		//if (args.length != 1)
 		//  System.out.println("Usage: java ChatServer port");
 		//  else
+		System.out.println("1 -- main(): 313");
 		server = new ChatServer(4444);
 
-
+		System.out.println("2 -- main(): 316");
 		new Connect4Daemon().start();
 	}
 }

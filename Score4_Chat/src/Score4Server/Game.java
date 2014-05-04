@@ -247,7 +247,7 @@ public class Game {
 	  int teammate = 0;
 	  try{
 		  while(playgame) {
-
+			  System.out.println("9--playGame4():250 - players"+me.getId());
 			  me = players.get(turnCounter);
 
 			  me.send("YOURTURN"); 		//me = the client of the current player and this message tells player that it's his turn
